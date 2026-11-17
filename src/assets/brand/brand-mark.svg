@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 140" fill="none" class="cj-mark-svg">
+  <defs>
+    <!-- CJ Signature Warm Orange Gradient -->
+    <linearGradient id="cj-mark-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="50%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <!-- Cross junction depth gradient -->
+    <linearGradient id="cj-cross-bar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="50%" stop-color="#D9531E" />
+      <stop offset="100%" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(2, 4)">
+    <!-- 1. The 'C' Arc on Left -->
+    <!-- Center (54, 70), R_out=45, R_in=26.5, stroke=18.5 -->
+    <!-- Arc opening on right from angle -36° (top) to +36° (bottom) -->
+    <path
+      d="M 87.5 43.5
+         A 44.5 44.5 0 1 0 87.5 96.5
+         L 74 86.5
+         A 26 26 0 1 1 74 53.5
+         Z"
+      fill="url(#cj-mark-grad)"
+    />
+
+    <!-- 2. The Arrow Shaft (ascending diagonal from bottom-left to top-right) -->
+    <!-- Crosses through junction and enters arrowhead base -->
+    <polygon
+      points="74,96 87,109 133,52 120,39"
+      fill="url(#cj-mark-grad)"
+    />
+
+    <!-- 3. The Crossing Bar into J (descending diagonal from top-left to bottom-right) -->
+    <polygon
+      points="69,44 82,31 123,83 110,96"
+      fill="url(#cj-cross-bar)"
+    />
+
+    <!-- 4. The Arrowhead at top right (Tip at 148, 12, right vertical to 148, 48) -->
+    <polygon
+      points="108,12 148,12 148,48 134,48 134,30 114,50"
+      fill="url(#cj-mark-grad)"
+    />
+
+    <!-- 5. The 'J' vertical stem and bottom curved hook -->
+    <!-- Right edge vertically aligned with arrowhead at X=148 -->
+    <!-- Notch between arrowhead bottom (Y=48) and J top (Y=52) -->
+    <path
+      d="M 129.5 52
+         L 148 52
+         L 148 94
+         A 27 27 0 0 1 121 121
+         A 27 27 0 0 1 100 113
+         L 110 99
+         A 13 13 0 0 0 121 105
+         A 13 13 0 0 0 129.5 92
+         Z"
+      fill="url(#cj-mark-grad)"
+    />
+  </g>
+</svg>

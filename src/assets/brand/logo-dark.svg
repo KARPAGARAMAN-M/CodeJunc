@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 36" fill="none">
+  <defs>
+    <linearGradient id="cj-logo-grad-dark" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="50%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="cj-logo-cross-dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="50%" stop-color="#D9531E" />
+      <stop offset="100%" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+
+  <!-- CJ Symbol (height 28, width 34) -->
+  <g transform="translate(1, 4) scale(0.235)">
+    <!-- 'C' Arc -->
+    <path
+      d="M 87.5 43.5 A 44.5 44.5 0 1 0 87.5 96.5 L 74 86.5 A 26 26 0 1 1 74 53.5 Z"
+      fill="url(#cj-logo-grad-dark)"
+    />
+    <!-- Arrow shaft -->
+    <polygon points="74,96 87,109 133,52 120,39" fill="url(#cj-logo-grad-dark)" />
+    <!-- Crossing bar into J -->
+    <polygon points="69,44 82,31 123,83 110,96" fill="url(#cj-logo-cross-dark)" />
+    <!-- Arrowhead -->
+    <polygon points="108,12 148,12 148,48 134,48 134,30 114,50" fill="url(#cj-logo-grad-dark)" />
+    <!-- 'J' stem and hook -->
+    <path
+      d="M 129.5 52 L 148 52 L 148 94 A 27 27 0 0 1 121 121 A 27 27 0 0 1 100 113 L 110 99 A 13 13 0 0 0 121 105 A 13 13 0 0 0 129.5 92 Z"
+      fill="url(#cj-logo-grad-dark)"
+    />
+  </g>
+
+  <!-- "CodeJunc" Wordmark in Dark Mode (Pure White) -->
+  <text
+    x="44"
+    y="25.5"
+    fill="#FFFFFF"
+    font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    font-size="20"
+    font-weight="700"
+    letter-spacing="-0.035em"
+  >CodeJunc</text>
+</svg>
