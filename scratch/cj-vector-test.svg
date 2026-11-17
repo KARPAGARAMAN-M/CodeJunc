@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="400" height="320">
+  <defs>
+    <!-- Dark background palette -->
+    <linearGradient id="cj-orange-grad" x1="0%" y1="60%" x2="100%" y2="20%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="45%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="cj-cross-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <rect width="200" height="160" fill="#1E1E1E" rx="16" />
+
+  <!-- Geometric CJ Brand Mark -->
+  <g transform="translate(15, 12)">
+    <!-- C Letter (Left circle with right opening) -->
+    <!-- Center (54, 70), outer R=44, inner R=24 => stroke-width=20 -->
+    <path
+      d="M 85 41 A 44 44 0 1 0 85 99"
+      fill="none"
+      stroke="#EA580C"
+      stroke-width="19"
+      stroke-linecap="butt"
+    />
+
+    <!-- The Cross junction X -->
+    <!-- Diagonal 1: from (68, 92) up-right to (128, 32) entering arrow -->
+    <path
+      d="M 72 96 L 126 42"
+      fill="none"
+      stroke="#F97316"
+      stroke-width="17"
+      stroke-linecap="square"
+    />
+
+    <!-- Diagonal 2: crossing down-right from (68, 48) to (108, 88) -->
+    <path
+      d="M 68 46 L 106 84"
+      fill="none"
+      stroke="#D86538"
+      stroke-width="17"
+      stroke-linecap="square"
+    />
+
+    <!-- Arrowhead at top right: Northeast pointer -->
+    <!-- Right edge is vertical at X=142, Bottom is horizontal at Y=44 -->
+    <polygon
+      points="106,12 142,12 142,48 128,48 128,26 106,48"
+      fill="#F59E0B"
+    />
+
+    <!-- J Hook at right -->
+    <!-- Vertical stem right edge at X=142, connects at bottom -->
+    <path
+      d="M 132 54 L 132 94 A 26 26 0 0 1 96 118"
+      fill="none"
+      stroke="#F59E0B"
+      stroke-width="19"
+      stroke-linecap="square"
+    />
+  </g>
+</svg>

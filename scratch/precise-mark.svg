@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="400" height="320" fill="none">
+  <defs>
+    <!-- Brand Gradients from original asset -->
+    <linearGradient id="cj-c-grad" x1="0%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#E25114" />
+      <stop offset="100%" stop-color="#F26522" />
+    </linearGradient>
+
+    <linearGradient id="cj-x-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C85A32" />
+      <stop offset="100%" stop-color="#B84A28" />
+    </linearGradient>
+
+    <linearGradient id="cj-arrow-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#E5591C" />
+      <stop offset="70%" stop-color="#F37324" />
+      <stop offset="100%" stop-color="#F7941D" />
+    </linearGradient>
+
+    <linearGradient id="cj-j-grad" x1="0%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#ED6D23" />
+      <stop offset="100%" stop-color="#F7941D" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(14, 10)">
+    <!-- 1. The 'C' Arc on Left -->
+    <!-- Center (54, 70), R_out = 44, R_in = 26 (thickness = 18) -->
+    <!-- Arc goes from angle ~38° to ~322° counterclockwise -->
+    <path
+      d="M 87 43
+         A 43 43 0 1 0 87 97
+         L 73 85
+         A 25 25 0 1 1 73 55
+         Z"
+      fill="url(#cj-c-grad)"
+    />
+
+    <!-- 2. The Arrow Shaft (bottom-left to top-right diagonal) -->
+    <polygon
+      points="74,96 85,107 131,51 120,40"
+      fill="url(#cj-arrow-grad)"
+    />
+
+    <!-- 3. The Cross bar into J (top-left to bottom-right diagonal) -->
+    <polygon
+      points="68,43 79,32 119,82 108,93"
+      fill="url(#cj-x-grad)"
+    />
+
+    <!-- 4. Arrowhead pointing northeast -->
+    <!-- Tip at (142, 14), right vertical to (142, 45), bottom horizontal to (111, 45) -->
+    <polygon
+      points="106,14 142,14 142,50 128,50 128,32 110,50"
+      fill="url(#cj-arrow-grad)"
+    />
+
+    <!-- 5. J Stem and Bottom Hook -->
+    <!-- Right vertical edge at 142 from Y=52 to Y=94, then curved hook at bottom -->
+    <path
+      d="M 124 52
+         L 142 52
+         L 142 94
+         A 26 26 0 0 1 116 120
+         A 26 26 0 0 1 96 112
+         L 106 98
+         A 12 12 0 0 0 116 102
+         A 12 12 0 0 0 124 90
+         Z"
+      fill="url(#cj-j-grad)"
+    />
+  </g>
+</svg>
