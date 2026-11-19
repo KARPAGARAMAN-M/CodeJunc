@@ -39,8 +39,8 @@ export default function Welcome() {
                 className="welcome-mark"
                 src="/assets/brand/brand-mark-transparent.png"
                 alt="CodeJunc Brand Mark"
-                width="120"
-                height="86"
+                width="96"
+                height="68"
               />
             </div>
           </div>
