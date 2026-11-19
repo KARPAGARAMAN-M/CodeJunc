@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 export default function OutputPanel({
+  height,
   output,
   error,
   notes,
@@ -40,7 +41,7 @@ export default function OutputPanel({
   };
 
   return (
-    <section className="output-card" aria-label="Program output">
+    <section className="output-card" style={height ? { height: `${height}px` } : undefined} aria-label="Program output">
       <div className="output-head">
         <div className="output-tabs" role="tablist" aria-label="Output and input">
           <button
@@ -124,7 +125,11 @@ export default function OutputPanel({
 
             {hasError && (
               <div className="output-errors">
-                <div className="error-badge">RUNTIME ERROR</div>
+                <div className="error-badge">
+                  {/compile|syntaxerror|javac|gcc|g\+\+|error:|undefined reference|declaration not found/i.test(error)
+                    ? 'COMPILATION ERROR'
+                    : 'RUNTIME ERROR'}
+                </div>
                 <pre>{error}</pre>
               </div>
             )}

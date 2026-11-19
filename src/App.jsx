@@ -8,7 +8,7 @@ import Documentation from './pages/Documentation';
 import About from './pages/About';
 
 function CompilerRedirect() {
-  const lastLang = localStorage.getItem('cj.lang') || 'python';
+  const lastLang = localStorage.getItem('cj.lang') || 'c';
   return <Navigate to={`/compiler/${lastLang}`} replace />;
 }
 
@@ -18,7 +18,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/languages" element={<LanguageSelection />} />
+          <Route path="/languages" element={<CompilerRedirect />} />
           <Route path="/compiler/:language" element={<Compiler />} />
           <Route path="/compiler" element={<CompilerRedirect />} />
           <Route path="/documentation" element={<Documentation />} />

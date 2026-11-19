@@ -10,6 +10,7 @@ export default function CodeEditor({
   onReset,
   onClear,
   onRun,
+  onToast,
 }) {
   const { theme } = useTheme();
   const editorRef = useRef(null);
@@ -61,6 +62,14 @@ export default function CodeEditor({
     }
   }, [theme]);
 
+  // Handle copy code
+  const handleCopyCode = () => {
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+      if (onToast) onToast('Code copied to clipboard');
+    }).catch(() => {});
+  };
+
   // Handle download
   const handleDownload = () => {
     const filename = language ? language.file : 'code.txt';
@@ -73,10 +82,11 @@ export default function CodeEditor({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    if (onToast) onToast(`Downloaded ${filename}`);
   };
 
   const monacoTheme = THEME_MONACO_MAP[theme] || 'codejunc-dark';
-  const monacoLang = language ? language.monaco : 'python';
+  const monacoLang = language ? language.monaco : 'c';
 
   return (
     <section className="editor-card" aria-label="Code editor">
@@ -85,22 +95,25 @@ export default function CodeEditor({
           {isDirty && (
             <span className="file-dot" title="Unsaved modifications" aria-label="Unsaved changes" />
           )}
-          <span className="file-name">{language ? language.file : 'main.py'}</span>
-          <span className="file-lang">{language ? language.name : 'Python'}</span>
+          <span className="file-name">{language ? language.file : 'main.c'}</span>
+          <span className="file-lang">{language ? language.name : 'C'}</span>
         </div>
         <div className="editor-actions">
+          {/* Copy code */}
           <button
             className="icon-btn"
             type="button"
-            title="Reset starter code"
-            aria-label="Reset starter code"
-            onClick={onReset}
+            title="Copy code"
+            aria-label="Copy code"
+            onClick={handleCopyCode}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M3.8 8.6A8.5 8.5 0 1 1 3.2 13" />
-              <path d="M3.8 3.6v5h5" />
+              <rect x="8.5" y="8.5" width="12" height="12" rx="2.5" />
+              <path d="M15.5 5.5v-1c0-1-.8-1.8-1.8-1.8H6c-1 0-1.8.8-1.8 1.8v7.7c0 1 .8 1.8 1.8 1.8h1" />
             </svg>
           </button>
+
+          {/* Download code */}
           <button
             className="icon-btn"
             type="button"
@@ -114,6 +127,22 @@ export default function CodeEditor({
               <path d="M4.5 16.5v3c0 1 .8 1.8 1.8 1.8h11.4c1 0 1.8-.8 1.8-1.8v-3" />
             </svg>
           </button>
+
+          {/* Reset starter code */}
+          <button
+            className="icon-btn"
+            type="button"
+            title="Reset starter code"
+            aria-label="Reset starter code"
+            onClick={onReset}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3.8 8.6A8.5 8.5 0 1 1 3.2 13" />
+              <path d="M3.8 3.6v5h5" />
+            </svg>
+          </button>
+
+          {/* Clear editor */}
           <button
             className="icon-btn"
             type="button"
@@ -125,7 +154,6 @@ export default function CodeEditor({
               <path d="M4 6.5h16" />
               <path d="M9.5 6.5V4.4c0-.8.6-1.4 1.4-1.4h2.2c.8 0 1.4.6 1.4 1.4v2.1" />
               <path d="m6.5 6.5.8 12.2c.1.9.8 1.6 1.7 1.6h6c.9 0 1.6-.7 1.7-1.6l.8-12.2" />
-              <path d="M10 10.5v6M14 10.5v6" />
             </svg>
           </button>
         </div>
@@ -167,7 +195,7 @@ export default function CodeEditor({
         <div className="editor-foot-left">
           <span>
             <i className="lang-dot" style={{ background: language ? language.color : 'var(--accent)' }} />
-            {language ? `${language.name} · ${language.id === 'python' || language.id === 'javascript' ? 'interpreted' : 'compiled'}` : ''}
+            {language ? language.name : ''}
           </span>
         </div>
         <div className="editor-foot-right">

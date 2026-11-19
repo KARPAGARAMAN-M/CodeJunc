@@ -31,21 +31,25 @@
           var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
           var saved = localStorage.getItem('cj.theme');
           var theme;
-          if (saved === 'dark' || saved === 'light' || saved === 'crimson-forge' || saved === 'united') {
+          if (saved === 'dark' || saved === 'light') {
             theme = saved;
           } else {
+            // Automatically follow OS preference: Light or Dark mode (never custom themes automatically)
             theme = systemDark ? 'dark' : 'light';
+            if (saved === 'crimson-forge' || saved === 'united') {
+              localStorage.removeItem('cj.theme');
+            }
           }
           document.documentElement.setAttribute('data-theme', theme);
           var meta = document.getElementById('theme-color');
           if (meta) {
-            meta.setAttribute('content', theme === 'united' ? '#1A1A1A' : (theme === 'crimson-forge' ? '#0B0F14' : (theme === 'dark' ? '#0D1117' : '#FFFFFF')));
+            meta.setAttribute('content', theme === 'dark' ? '#0D1117' : '#FFFFFF');
           }
         } catch (e) {}
       })();
     </script>
-    <script type="module" crossorigin src="/assets/index-oRe72OaI.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BU7gS_Mc.css">
+    <script type="module" crossorigin src="/assets/index-D6dzn4mN.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Bs3tcUSE.css">
   </head>
   <body>
     <div id="root"></div>

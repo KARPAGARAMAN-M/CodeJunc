@@ -2,27 +2,29 @@ import React from 'react';
 import { Link, NavLink, useParams } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
 
-export default function Navbar({ children, activeLanguage = 'python' }) {
+export default function Navbar({ children, activeLanguage = 'python', isWorkspace = false }) {
   const params = useParams();
   const currentLang = params.language || activeLanguage || 'python';
 
   return (
     <header className="topbar">
       <div className="topbar-inner">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <Link to="/" className="brand" aria-label="CodeJunc Home">
-            <img
-              src="/assets/brand/logo-dark-transparent.png"
-              alt="CodeJunc"
-              className="brand-logo-img brand-logo-dark"
-            />
-            <img
-              src="/assets/brand/logo-light-transparent.png"
-              alt="CodeJunc"
-              className="brand-logo-img brand-logo-light"
-            />
-          </Link>
+        <Link to="/" className="brand" aria-label="CodeJunc home" title="CodeJunc">
+          <img
+            src="/assets/brand/logo-dark-transparent.png"
+            alt="CodeJunc"
+            className="brand-logo-img brand-logo-dark"
+            height="28"
+          />
+          <img
+            src="/assets/brand/logo-light-transparent.png"
+            alt="CodeJunc"
+            className="brand-logo-img brand-logo-light"
+            height="28"
+          />
+        </Link>
 
+        {!isWorkspace && (
           <nav className="topbar-nav" aria-label="Main Navigation">
             <NavLink
               to="/languages"
@@ -49,11 +51,11 @@ export default function Navbar({ children, activeLanguage = 'python' }) {
               About
             </NavLink>
           </nav>
-        </div>
+        )}
 
         <div className="topbar-actions">
           {children}
-          <ThemeToggle variant="dropdown" />
+          {!isWorkspace && <ThemeToggle variant="dropdown" />}
         </div>
       </div>
     </header>

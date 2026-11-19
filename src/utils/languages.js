@@ -25,101 +25,58 @@ export const LANGUAGE_ICONS = {
   </svg>`,
 };
 
-export const DEFAULT_LANGUAGE = 'python';
+export const DEFAULT_LANGUAGE = 'c';
 
 export const LANGUAGES = {
-  python: {
-    id: 'python',
-    name: 'Python',
-    short: 'Python',
-    family: 'interpreted',
-    familyLabel: 'interpreted',
-    file: 'main.py',
-    monaco: 'python',
-    monacoLang: 'python',
-    version: '3.11',
-    description: 'General-purpose, readable, and widely used for data, web, and scripting.',
-    color: '#3776ab',
-    accent: '#3776ab',
-    icon: LANGUAGE_ICONS.python,
-    starter: 'print("Hello, World!")\n',
-    inputHint: 'One value per line, e.g.\n5\n12',
-  },
-  javascript: {
-    id: 'javascript',
-    name: 'JavaScript',
-    short: 'JS',
-    family: 'web',
-    familyLabel: 'browser',
-    file: 'main.js',
-    monaco: 'javascript',
-    monacoLang: 'javascript',
-    version: 'ES2024',
-    description: 'The ubiquitous language of the web, running in sandboxed execution.',
-    color: '#e8c500',
-    accent: '#e8c500',
-    icon: LANGUAGE_ICONS.javascript,
-    starter: 'console.log("Hello, World!");\n',
-    inputHint: 'One value per line, e.g.\n5\n12',
-  },
   c: {
     id: 'c',
     name: 'C',
     short: 'C',
-    family: 'compiled',
-    familyLabel: 'compiled',
     file: 'main.c',
     monaco: 'c',
     monacoLang: 'c',
-    version: 'C17',
-    description: 'Foundational procedural language delivering raw speed and hardware control.',
+    version: 'GCC 10',
+    pistonLang: 'c',
+    pistonVersion: '10.2.0',
     color: '#5aa2e0',
-    accent: '#5aa2e0',
     icon: LANGUAGE_ICONS.c,
     starter:
       '#include <stdio.h>\n\n' +
-      'int main(void) {\n' +
+      'int main() {\n' +
       '    printf("Hello, World!\\n");\n' +
       '    return 0;\n' +
       '}\n',
-    inputHint: 'Space-separated values, e.g.\n5 12',
   },
   cpp: {
     id: 'cpp',
     name: 'C++',
     short: 'C++',
-    family: 'compiled',
-    familyLabel: 'compiled',
     file: 'main.cpp',
     monaco: 'cpp',
     monacoLang: 'cpp',
-    version: 'C++20',
-    description: 'Powerful systems language with high-performance abstractions and STL.',
+    version: 'G++ 10',
+    pistonLang: 'c++',
+    pistonVersion: '10.2.0',
     color: '#5d9bd3',
-    accent: '#5d9bd3',
     icon: LANGUAGE_ICONS.cpp,
     starter:
-      '#include <iostream>\n' +
-      'using namespace std;\n\n' +
+      '#include <iostream>\n\n' +
       'int main() {\n' +
-      '    cout << "Hello, World!" << endl;\n' +
+      '    std::cout << "Hello, World!" << std::endl;\n' +
       '    return 0;\n' +
       '}\n',
-    inputHint: 'Space-separated values, e.g.\n5 12',
   },
   java: {
     id: 'java',
     name: 'Java',
     short: 'Java',
-    family: 'compiled',
-    familyLabel: 'compiled',
     file: 'Main.java',
     monaco: 'java',
     monacoLang: 'java',
-    version: 'OpenJDK 21',
-    description: 'Robust, object-oriented language engineered for cross-platform reliability.',
+    version: 'OpenJDK 15',
+    pistonLang: 'java',
+    pistonVersion: '15.0.2',
     color: '#e76f00',
-    accent: '#e76f00',
     icon: LANGUAGE_ICONS.java,
     starter:
       'public class Main {\n' +
@@ -127,9 +84,44 @@ export const LANGUAGES = {
       '        System.out.println("Hello, World!");\n' +
       '    }\n' +
       '}\n',
-    inputHint: 'One value per line, e.g.\n5\n12',
+  },
+  python: {
+    id: 'python',
+    name: 'Python',
+    short: 'Python',
+    file: 'main.py',
+    monaco: 'python',
+    monacoLang: 'python',
+    version: '3.10',
+    pistonLang: 'python',
+    pistonVersion: '3.10.0',
+    color: '#3776ab',
+    icon: LANGUAGE_ICONS.python,
+    starter: 'print("Hello, World!")\n',
+  },
+  javascript: {
+    id: 'javascript',
+    name: 'JavaScript',
+    short: 'JS',
+    file: 'main.js',
+    monaco: 'javascript',
+    monacoLang: 'javascript',
+    version: 'Node 18',
+    pistonLang: 'javascript',
+    pistonVersion: '18.15.0',
+    color: '#e8c500',
+    icon: LANGUAGE_ICONS.javascript,
+    starter: 'console.log("Hello, World!");\n',
   },
 };
+
+export const LANGUAGE_LIST = [
+  LANGUAGES.c,
+  LANGUAGES.cpp,
+  LANGUAGES.java,
+  LANGUAGES.python,
+  LANGUAGES.javascript,
+];
 
 export function getLanguage(id) {
   if (!id) return LANGUAGES[DEFAULT_LANGUAGE];

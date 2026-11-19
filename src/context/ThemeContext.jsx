@@ -15,11 +15,19 @@ export function ThemeProvider({ children }) {
   const [themePreference, setThemePreference] = useState(() => {
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      if (saved && ['dark', 'light', 'crimson-forge', 'united', 'system'].includes(saved)) {
+      if (saved === 'dark' || saved === 'light') {
         return saved;
       }
+      if (saved === 'system') {
+        return 'system';
+      }
+      // If a custom theme was saved previously (e.g. crimson-forge, united), purge it
+      // so it never automatically applies when opening workspace or refreshing
+      if (saved === 'crimson-forge' || saved === 'united') {
+        localStorage.removeItem(THEME_STORAGE_KEY);
+      }
     } catch (e) {}
-    // First time visitor: automatically default to system preference
+    // First time visitor / initial visit: automatically default to system preference (Light or Dark)
     return 'system';
   });
 
@@ -61,10 +69,24 @@ export function ThemeProvider({ children }) {
   }, [activeTheme]);
 
   const setTheme = (pref) => {
+    if (!['dark', 'light', 'crimson-forge', 'united', 'system'].includes(pref)) return;
     setThemePreference(pref);
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, pref);
+      if (pref === 'dark' || pref === 'light' || pref === 'system') {
+        localStorage.setItem(THEME_STORAGE_KEY, pref);
+      } else {
+        // Do not persist custom themes to prevent them appearing automatically on next visit / restart
+        localStorage.removeItem(THEME_STORAGE_KEY);
+      }
     } catch (e) {}
+
+    // Apply synchronously to DOM immediately for zero-delay instant switch
+    const resolved = pref === 'system' ? (systemDark ? 'dark' : 'light') : pref;
+    document.documentElement.setAttribute('data-theme', resolved);
+    const meta = document.getElementById('theme-color') || document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute('content', THEME_COLORS[resolved] || '#0D1117');
+    }
   };
 
   const toggleTheme = () => {
@@ -78,10 +100,13 @@ export function ThemeProvider({ children }) {
     <ThemeContext.Provider
       value={{
         theme: activeTheme,
+        preference: themePreference,
         themePreference,
         setTheme,
+        setThemePreference: setTheme,
         toggleTheme,
         isDark,
+        systemTheme: systemDark ? 'dark' : 'light',
       }}
     >
       {children}

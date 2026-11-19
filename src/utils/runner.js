@@ -1648,6 +1648,107 @@ async function runnerImpl(opts, codeArg, stdinArg, onPhaseArg) {
     onPhase = onPhaseArg;
   }
 
+  // 1. Attempt Real Backend Compiler Execution Service (Piston API)
+  if (typeof fetch !== 'undefined') {
+    try {
+      const meta = getLanguage(langId);
+      const pistonLang = meta.pistonLang || (langId === 'cpp' ? 'c++' : langId);
+      const pistonVer = meta.pistonVersion || '*';
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+      let resp = await fetch('https://emkc.org/api/v2/piston/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          language: pistonLang,
+          version: pistonVer,
+          files: [{ name: meta.file || 'main', content: code }],
+          stdin: stdin || '',
+        }),
+      });
+
+      // If specific version is not installed on Piston host, retry with wildcard version
+      if (!resp.ok && resp.status === 400 && pistonVer !== '*') {
+        resp = await fetch('https://emkc.org/api/v2/piston/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            language: pistonLang,
+            version: '*',
+            files: [{ name: meta.file || 'main', content: code }],
+            stdin: stdin || '',
+          }),
+        });
+      }
+
+      clearTimeout(timeoutId);
+
+      if (resp.ok) {
+        const data = await resp.json();
+
+        // 1. Check for compilation errors
+        const compileErr =
+          data.compile &&
+          (data.compile.code !== 0 || (data.compile.stderr && data.compile.stderr.trim().length > 0))
+            ? (data.compile.stderr && data.compile.stderr.trim()) || data.compile.output || 'Compilation failed'
+            : null;
+
+        // 2. Check for runtime errors
+        const runErr =
+          data.run &&
+          (data.run.code !== 0 || (data.run.stderr && data.run.stderr.trim().length > 0))
+            ? (data.run.stderr && data.run.stderr.trim()) ||
+              (data.run.code !== 0 ? (data.run.output || `Process exited with code ${data.run.code}`) : null)
+            : null;
+
+        const fullErr = compileErr || runErr || null;
+        const out = compileErr
+          ? ''
+          : ((data.run && data.run.stdout) || (!fullErr && data.run ? data.run.output : '') || '');
+
+        return {
+          output: out,
+          error: fullErr,
+          notes: [],
+          status: fullErr ? 'error' : 'success',
+          stage: compileErr ? 'compile' : (runErr ? 'runtime' : null),
+          durationMs: 0,
+        };
+      } else {
+        const errJson = await resp.json().catch(() => null);
+        const errMsg =
+          errJson && errJson.message
+            ? errJson.message
+            : `Compiler API error (${resp.status}): Execution failed.`;
+        return {
+          output: '',
+          error: errMsg,
+          notes: [],
+          status: 'error',
+          stage: 'api',
+          durationMs: 0,
+        };
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        return {
+          output: '',
+          error: 'Compiler execution timed out (limit exceeded).',
+          notes: [],
+          status: 'error',
+          stage: 'runtime',
+          durationMs: 0,
+        };
+      }
+      // Backend service unreachable or offline — continue to local fallback
+    }
+  }
+
+  // 2. Client-side isolated fallback
   const raw = await CJ.run(langId, code, stdin, onPhase);
 
   const errors = [];
@@ -1662,11 +1763,14 @@ async function runnerImpl(opts, codeArg, stdinArg, onPhaseArg) {
     });
   }
 
+  const isErr = errors.length > 0 || raw.status === 'compile_error' || raw.status === 'error';
+
   return {
-    output: raw.stdout || '',
-    error: errors.length > 0 ? errors.join('\n') : null,
+    output: isErr ? '' : (raw.stdout || ''),
+    error: errors.length > 0 ? errors.join('\n') : (isErr ? 'Execution failed' : null),
     notes: raw.notes || [],
-    status: raw.status,
+    status: isErr ? 'error' : 'success',
+    stage: raw.compileErrors && raw.compileErrors.length > 0 ? 'compile' : 'runtime',
     durationMs: raw.durationMs,
     raw,
   };

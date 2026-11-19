@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import ThemeToggle from '../components/ThemeToggle';
 import CodeEditor from '../components/CodeEditor';
 import OutputPanel from '../components/OutputPanel';
 import { LANGUAGES, getLanguage, DEFAULT_LANGUAGE } from '../utils/languages';
@@ -13,6 +14,14 @@ export default function Compiler() {
   // Validate or fallback language
   const activeLangKey = (langParam && LANGUAGES[langParam.toLowerCase()]) ? langParam.toLowerCase() : DEFAULT_LANGUAGE;
   const currentLanguage = getLanguage(activeLangKey);
+
+  // Set workspace body class for layout styling
+  useEffect(() => {
+    document.body.className = 'is-workspace';
+    return () => {
+      document.body.className = '';
+    };
+  }, []);
 
   // Language Dropdown open state
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -160,8 +169,11 @@ export default function Compiler() {
       if (res.error) {
         setError(res.error);
         setStatus('error');
+        if (res.output) {
+          setOutput(res.output);
+        }
       } else {
-        if (res.output) setOutput(res.output);
+        setOutput(res.output || '');
         if (res.notes) setNotes(res.notes);
         setStatus('success');
       }
@@ -218,72 +230,9 @@ export default function Compiler() {
   };
 
   return (
-    <div className="workspace-container">
-      <Navbar activeLanguage={activeLangKey}>
-        {/* Language Selector Dropdown */}
-        <div className={`picker lang-picker ${isLangOpen ? 'is-open' : ''}`} ref={langDropdownRef}>
-          <button
-            className="picker-btn"
-            id="lang-btn"
-            type="button"
-            aria-haspopup="listbox"
-            aria-expanded={isLangOpen}
-            aria-label="Select language"
-            onClick={() => setIsLangOpen((prev) => !prev)}
-          >
-            <span
-              className="picker-ico"
-              style={{ color: currentLanguage.color }}
-              dangerouslySetInnerHTML={{ __html: currentLanguage.icon }}
-            />
-            <span className="picker-label">{currentLanguage.name}</span>
-            <svg
-              className="chev"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m6 9.5 6 6 6-6" />
-            </svg>
-          </button>
-
-          {isLangOpen && (
-            <div className="picker-menu lang-menu" role="listbox" aria-label="Language selection">
-              {Object.values(LANGUAGES).map((lang) => (
-                <button
-                  key={lang.id}
-                  type="button"
-                  className={`picker-opt ${lang.id === activeLangKey ? 'is-selected' : ''}`}
-                  role="option"
-                  aria-selected={lang.id === activeLangKey}
-                  onClick={() => {
-                    setIsLangOpen(false);
-                    navigate(`/compiler/${lang.id}`);
-                  }}
-                >
-                  <span
-                    className="opt-ico"
-                    style={{ color: lang.color }}
-                    dangerouslySetInnerHTML={{ __html: lang.icon }}
-                  />
-                  <span className="opt-name">{lang.name}</span>
-                  <span className="opt-ver">{lang.version}</span>
-                  {lang.id === activeLangKey && (
-                    <svg className="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="m4.5 12.5 5 5 10-11" />
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Run Button */}
+    <div className="workspace is-visible" id="workspace">
+      {/* Tier 1 Header: CodeJunc Logo (left) | ▶ Run (right) */}
+      <Navbar isWorkspace={true} activeLanguage={activeLangKey}>
         <button
           className="btn-run"
           id="btn-run"
@@ -306,23 +255,95 @@ export default function Compiler() {
         </button>
       </Navbar>
 
-      {/* Main Workspace Split Layout */}
+      {/* Main Workspace */}
       <main className="app">
-        {/* Monaco Code Editor */}
-        <div style={{ flex: 1, minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
-          <CodeEditor
-            language={currentLanguage}
-            code={code}
-            onChange={handleCodeChange}
-            onReset={handleReset}
-            onClear={handleClearCode}
-            onRun={handleRun}
-          />
+        {/* Tier 2 Sub-toolbar: Theme ▼ (left) | Language ▼ (right) */}
+        <div className="workspace-subbar">
+          <div className="subbar-left">
+            <ThemeToggle variant="dropdown" />
+          </div>
+
+          <div className="subbar-right">
+            {/* Language Selector Dropdown */}
+            <div className={`picker lang-picker ${isLangOpen ? 'open is-open' : ''}`} ref={langDropdownRef}>
+              <button
+                className="picker-btn"
+                id="lang-btn"
+                type="button"
+                aria-haspopup="listbox"
+                aria-expanded={isLangOpen}
+                aria-label="Select language"
+                onClick={() => setIsLangOpen((prev) => !prev)}
+              >
+                <span
+                  className="picker-ico"
+                  style={{ color: currentLanguage.color }}
+                  dangerouslySetInnerHTML={{ __html: currentLanguage.icon }}
+                />
+                <span className="picker-label">{currentLanguage.name}</span>
+                <svg
+                  className="chev"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9.5 6 6 6-6" />
+                </svg>
+              </button>
+
+              {isLangOpen && (
+                <div className="picker-menu lang-menu" role="listbox" aria-label="Language selection">
+                  {Object.values(LANGUAGES).map((lang) => (
+                    <button
+                      key={lang.id}
+                      type="button"
+                      className={`picker-opt ${lang.id === activeLangKey ? 'is-selected' : ''}`}
+                      role="option"
+                      aria-selected={lang.id === activeLangKey}
+                      onClick={() => {
+                        setIsLangOpen(false);
+                        navigate(`/compiler/${lang.id}`);
+                      }}
+                    >
+                      <span
+                        className="opt-ico"
+                        style={{ color: lang.color }}
+                        dangerouslySetInnerHTML={{ __html: lang.icon }}
+                      />
+                      <span className="opt-name">{lang.name}</span>
+                      <span className="opt-ver">{lang.version}</span>
+                      {lang.id === activeLangKey && (
+                        <svg className="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="m4.5 12.5 5 5 10-11" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Drag Resizer Handle */}
+        {/* Tier 3: Monaco Code Editor */}
+        <CodeEditor
+          language={currentLanguage}
+          code={code}
+          onChange={handleCodeChange}
+          onReset={handleReset}
+          onClear={handleClearCode}
+          onRun={handleRun}
+          onToast={showToast}
+        />
+
+        {/* Tier 4: Drag Resizer Handle */}
         <div
           className="resizer"
+          id="resizer"
           role="separator"
           aria-orientation="horizontal"
           aria-label="Resize panels"
@@ -333,21 +354,20 @@ export default function Compiler() {
           <div className="resizer-thumb" />
         </div>
 
-        {/* Output Panel */}
-        <div style={{ height: `${outputHeight}px`, minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
-          <OutputPanel
-            output={output}
-            error={error}
-            notes={notes}
-            status={status}
-            executionTime={executionTime}
-            stdin={stdin}
-            setStdin={setStdin}
-            onClear={handleClearOutput}
-            onCopy={handleCopyOutput}
-            activeLanguage={currentLanguage}
-          />
-        </div>
+        {/* Tier 5: Output Panel */}
+        <OutputPanel
+          height={outputHeight}
+          output={output}
+          error={error}
+          notes={notes}
+          status={status}
+          executionTime={executionTime}
+          stdin={stdin}
+          setStdin={setStdin}
+          onClear={handleClearOutput}
+          onCopy={handleCopyOutput}
+          activeLanguage={currentLanguage}
+        />
       </main>
 
       {/* Toast Feedback */}

@@ -1,6 +1,6 @@
 /**
  * Monaco Theme Definitions for CodeJunc
- * Supports: 'dark' (GitHub Dark), 'light' (GitHub Light), 'crimson-forge', 'united'
+ * Supports: 'dark' (GitHub Dark), 'light' (GitHub Light), 'crimson-forge' (Crimson Forge), 'united' (United)
  */
 
 export const THEME_MONACO_MAP = {
@@ -13,7 +13,9 @@ export const THEME_MONACO_MAP = {
 export function defineMonacoThemes(monaco) {
   if (!monaco) return;
 
+  // ============================================================
   // 1. GitHub Dark
+  // ============================================================
   monaco.editor.defineTheme('codejunc-dark', {
     base: 'vs-dark',
     inherit: true,
@@ -43,7 +45,9 @@ export function defineMonacoThemes(monaco) {
     },
   });
 
+  // ============================================================
   // 2. GitHub Light
+  // ============================================================
   monaco.editor.defineTheme('codejunc-light', {
     base: 'vs',
     inherit: true,
@@ -73,44 +77,80 @@ export function defineMonacoThemes(monaco) {
     },
   });
 
-  // 3. Crimson Forge
+  // ============================================================
+  // 3. Crimson Forge — Midnight Black, Obsidian Navy, Crimson Garnet & Warm Gold
+  // ============================================================
   monaco.editor.defineTheme('codejunc-crimson-forge', {
     base: 'vs-dark',
     inherit: true,
     rules: [
       { token: 'keyword', foreground: 'FF7B72' },
-      { token: 'type', foreground: '79C0FF' },
+      { token: 'keyword.control', foreground: 'FF7B72' },
       { token: 'function', foreground: 'D2A8FF' },
+      { token: 'function.call', foreground: 'D2A8FF' },
       { token: 'string', foreground: 'A5D6FF' },
-      { token: 'number', foreground: '79C0FF' },
-      { token: 'comment', foreground: '7D8590', fontStyle: 'italic' },
+      { token: 'string.escape', foreground: 'E5B94D' },
       { token: 'variable', foreground: 'FFA657' },
-      { token: 'delimiter', foreground: 'F8FAFC' },
+      { token: 'variable.parameter', foreground: 'FFA657' },
+      { token: 'variable.predefined', foreground: 'E5B94D' },
+      { token: 'number', foreground: '79C0FF' },
+      { token: 'number.hex', foreground: '79C0FF' },
+      { token: 'number.float', foreground: '79C0FF' },
+      { token: 'comment', foreground: '7D8590', fontStyle: 'italic' },
+      { token: 'comment.doc', foreground: '7D8590', fontStyle: 'italic' },
+      { token: 'type', foreground: '79C0FF' },
+      { token: 'type.identifier', foreground: '79C0FF' },
+      { token: 'constant', foreground: '79C0FF' },
       { token: 'operator', foreground: 'E5B94D' },
+      { token: 'delimiter', foreground: 'F8FAFC' },
+      { token: 'delimiter.bracket', foreground: 'F8FAFC' },
+      { token: 'tag', foreground: 'FF7B72' },
+      { token: 'attribute.name', foreground: 'D2A8FF' },
+      { token: 'attribute.value', foreground: 'A5D6FF' },
     ],
     colors: {
       'editor.background': '#0B0F14',
       'editor.foreground': '#F8FAFC',
-      'editorLineNumber.foreground': '#7D8590',
-      'editorLineNumber.activeForeground': '#F8FAFC',
       'editorGutter.background': '#0B0F14',
+      'editorLineNumber.foreground': '#7D8590',
+      'editorLineNumber.activeForeground': '#E5B94D',
       'editorCursor.foreground': '#E5B94D',
-      'editor.selectionBackground': '#3A1625',
-      'editor.inactiveSelectionBackground': '#2A121D',
-      'editor.lineHighlightBackground': '#10182660',
-      'editorIndentGuide.background': '#182232',
-      'editorIndentGuide.activeBackground': '#242B36',
+      'editor.selectionBackground': '#3A1625D0',
+      'editor.inactiveSelectionBackground': '#242B3690',
+      'editor.selectionHighlightBackground': '#3A162570',
+      'editor.lineHighlightBackground': '#101826',
+      'editor.lineHighlightBorder': '#242B3600',
+      'editorIndentGuide.background': '#132238',
+      'editorIndentGuide.activeBackground': '#E5B94D60',
+      'editorWhitespace.foreground': '#242B36',
+      'editorBracketMatch.background': '#3A1625A0',
+      'editorBracketMatch.border': '#E5B94D',
+      'editorSuggestWidget.background': '#101826',
+      'editorSuggestWidget.border': '#242B36',
+      'editorSuggestWidget.foreground': '#F8FAFC',
+      'editorSuggestWidget.selectedBackground': '#3A1625',
+      'editorSuggestWidget.highlightForeground': '#E5B94D',
+      'scrollbarSlider.background': '#242B3650',
+      'scrollbarSlider.hoverBackground': '#3A162590',
+      'scrollbarSlider.activeBackground': '#DA363380',
+      'editorError.foreground': '#DA3633',
+      'editorWarning.foreground': '#D89B1D',
+      'editorInfo.foreground': '#79C0FF',
     },
   });
 
-  // 4. United Theme
+  // ============================================================
+  // 4. United Theme — Pitch Black, Crimson Red & Gold Yellow
+  // ============================================================
   monaco.editor.defineTheme('codejunc-united', {
     base: 'vs-dark',
     inherit: true,
     rules: [
       { token: 'keyword', foreground: 'DA291C' },
+      { token: 'keyword.control', foreground: 'DA291C' },
       { token: 'type', foreground: 'FBE122' },
       { token: 'function', foreground: 'FBE122' },
+      { token: 'function.call', foreground: 'FBE122' },
       { token: 'string', foreground: '4ADE80' },
       { token: 'number', foreground: 'FBE122' },
       { token: 'comment', foreground: '888888', fontStyle: 'italic' },
@@ -121,15 +161,20 @@ export function defineMonacoThemes(monaco) {
     colors: {
       'editor.background': '#141414',
       'editor.foreground': '#FFFFFF',
+      'editorGutter.background': '#141414',
       'editorLineNumber.foreground': '#666666',
       'editorLineNumber.activeForeground': '#FFFFFF',
-      'editorGutter.background': '#141414',
       'editorCursor.foreground': '#FBE122',
       'editor.selectionBackground': '#3A000A',
       'editor.inactiveSelectionBackground': '#260007',
       'editor.lineHighlightBackground': '#1A1A1A',
       'editorIndentGuide.background': '#222222',
-      'editorIndentGuide.activeBackground': '#333333',
+      'editorIndentGuide.activeBackground': '#DA291C60',
+      'editorSuggestWidget.background': '#1A1A1A',
+      'editorSuggestWidget.border': '#333333',
+      'editorSuggestWidget.foreground': '#FFFFFF',
+      'editorSuggestWidget.selectedBackground': '#3A000A',
+      'editorSuggestWidget.highlightForeground': '#FBE122',
     },
   });
 }
