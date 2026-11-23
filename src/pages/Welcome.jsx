@@ -1,8 +1,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Welcome() {
   const navigate = useNavigate();
+  const { setIsWelcome } = useTheme();
+
+  // Ensure Welcome page strictly adheres to system theme while mounted
+  useEffect(() => {
+    setIsWelcome(true);
+    return () => {
+      setIsWelcome(false);
+    };
+  }, [setIsWelcome]);
 
   // Set welcome body class for layout styling
   useEffect(() => {

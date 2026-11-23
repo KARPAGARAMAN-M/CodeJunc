@@ -1,0 +1,34 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+codejunc:
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://127.0.0.1:3000"
+  rate-limit:
+    enabled: true
+    requests-per-minute: 30
+
+judge0:
+  base-url: ${JUDGE0_BASE_URL:https://ce.judge0.com}
+  api-key: ${JUDGE0_API_KEY:}
+  api-host: ${JUDGE0_API_HOST:}
+  connect-timeout-ms: 5000
+  read-timeout-ms: 10000
+  poll-interval-ms: 500
+  poll-max-attempts: 20
+  cpu-time-limit: 5.0
+  memory-limit: 128000
+  # Default verified language IDs for Judge0 CE
+  languages:
+    c: 50
+    cpp: 54
+    java: 62
+    python: 71
+    javascript: 63
+
+logging:
+  level:
+    com.codejunc: INFO
+    org.springframework.web: WARN

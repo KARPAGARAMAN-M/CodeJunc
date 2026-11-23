@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function OutputPanel({
   height,
@@ -14,6 +14,13 @@ export default function OutputPanel({
   activeLanguage,
 }) {
   const [activeTab, setActiveTab] = useState('output'); // 'output' | 'input'
+
+  // Automatically switch to Output tab when execution starts
+  useEffect(() => {
+    if (status === 'running') {
+      setActiveTab('output');
+    }
+  }, [status]);
 
   const hasOutput = output && output.trim().length > 0;
   const hasError = error && error.trim().length > 0;

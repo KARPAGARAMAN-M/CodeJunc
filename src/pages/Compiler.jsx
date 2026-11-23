@@ -163,7 +163,7 @@ export default function Compiler() {
         },
       });
 
-      const elapsed = Math.round(performance.now() - startTime);
+      const elapsed = res && res.executionTimeMs != null ? res.executionTimeMs : Math.round(performance.now() - startTime);
       setExecutionTime(elapsed);
 
       if (res.error) {
@@ -178,7 +178,7 @@ export default function Compiler() {
         setStatus('success');
       }
     } catch (err) {
-      const elapsed = Math.round(performance.now() - startTime);
+      const elapsed = res && res.executionTimeMs != null ? res.executionTimeMs : Math.round(performance.now() - startTime);
       setExecutionTime(elapsed);
       setError(err && err.message ? err.message : String(err));
       setStatus('error');

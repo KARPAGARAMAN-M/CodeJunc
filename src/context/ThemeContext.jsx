@@ -8,10 +8,14 @@ const THEME_COLORS = {
   dark: '#0D1117',
   light: '#FFFFFF',
   'crimson-forge': '#0B0F14',
-  united: '#1A1A1A',
+  united: '#0A0E17',
 };
 
 export function ThemeProvider({ children }) {
+  const [isWelcome, setIsWelcome] = useState(() => {
+    return typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '');
+  });
+
   const [themePreference, setThemePreference] = useState(() => {
     try {
       const saved = localStorage.getItem(THEME_STORAGE_KEY);
@@ -51,9 +55,23 @@ export function ThemeProvider({ children }) {
     }
   }, []);
 
-  // Compute resolved active theme
-  const activeTheme =
-    themePreference === 'system'
+  // Listen for browser navigation changes (popstate)
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const atWelcome = window.location.pathname === '/' || window.location.pathname === '';
+      setIsWelcome(atWelcome);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  // Compute resolved active theme:
+  // On the Welcome page, theme strictly follows the operating system's theme
+  const activeTheme = isWelcome
+    ? systemDark
+      ? 'dark'
+      : 'light'
+    : themePreference === 'system'
       ? systemDark
         ? 'dark'
         : 'light'
@@ -81,7 +99,9 @@ export function ThemeProvider({ children }) {
     } catch (e) {}
 
     // Apply synchronously to DOM immediately for zero-delay instant switch
-    const resolved = pref === 'system' ? (systemDark ? 'dark' : 'light') : pref;
+    const resolved = isWelcome
+      ? (systemDark ? 'dark' : 'light')
+      : (pref === 'system' ? (systemDark ? 'dark' : 'light') : pref);
     document.documentElement.setAttribute('data-theme', resolved);
     const meta = document.getElementById('theme-color') || document.querySelector('meta[name="theme-color"]');
     if (meta) {
@@ -107,6 +127,8 @@ export function ThemeProvider({ children }) {
         toggleTheme,
         isDark,
         systemTheme: systemDark ? 'dark' : 'light',
+        isWelcome,
+        setIsWelcome,
       }}
     >
       {children}

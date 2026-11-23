@@ -16,7 +16,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/brand/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/brand/apple-touch-icon.png" />
 
-    <!-- Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+    <!-- Fonts: Inter, JetBrains Mono & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -29,9 +29,13 @@
       (function () {
         try {
           var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isWelcome = window.location.pathname === '/' || window.location.pathname === '';
           var saved = localStorage.getItem('cj.theme');
           var theme;
-          if (saved === 'dark' || saved === 'light') {
+          if (isWelcome) {
+            // Welcome page theme is strictly based on the system's theme
+            theme = systemDark ? 'dark' : 'light';
+          } else if (saved === 'dark' || saved === 'light') {
             theme = saved;
           } else {
             // Automatically follow OS preference: Light or Dark mode (never custom themes automatically)
@@ -48,8 +52,8 @@
         } catch (e) {}
       })();
     </script>
-    <script type="module" crossorigin src="/assets/index-Bdw_HRqb.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dtxzzd9y.css">
+    <script type="module" crossorigin src="/assets/index-BtdofwIb.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CT_2oiww.css">
   </head>
   <body>
     <div id="root"></div>
