@@ -463,9 +463,9 @@ svg {
 }
 
 /* ============================================================
-   WELCOME PAGE — Professional Developer Experience
-   Inspired by Linear, Cursor, Raycast, and VS Code.
-   Clean, balanced, modern, developer-focused, distraction-free.
+   WELCOME PAGE — Premium Developer Product Experience
+   Strictly focused: Brand Mark, Wordmark, Tagline, Start Coding CTA
+   Precision-crafted typography, ambient lighting, architectural depth
    ============================================================ */
 .welcome {
   position: fixed;
@@ -489,7 +489,8 @@ svg {
   visibility: hidden;
 }
 
-/* Background Engineering Grid Pattern */
+/* Background Engineering Canvas & Vignette */
+.welcome-bg-canvas,
 .welcome-grid-bg {
   position: absolute;
   inset: 0;
@@ -498,109 +499,29 @@ svg {
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, black 20%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, black 20%, transparent 80%);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 48%, black 15%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 48%, black 15%, transparent 75%);
 }
 
-/* Subtle Ambient Glow */
+/* Premium Warm Ambient Glow */
 .welcome-ambient-glow {
   position: absolute;
-  top: 45%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 520px;
-  height: 340px;
+  width: 580px;
+  height: 380px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(234, 88, 12, 0.07) 0%, rgba(234, 88, 12, 0) 70%);
+  background: radial-gradient(ellipse at center, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0.035) 45%, transparent 70%);
   pointer-events: none;
-  filter: blur(60px);
+  filter: blur(80px);
   z-index: 1;
+  transition: opacity 0.3s ease;
 }
 
-/* Welcome Top Utility Bar */
-.welcome-topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 10;
-}
-
-.welcome-badge-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  font-size: 12px;
-  font-family: var(--font-mono);
-  color: var(--text-2);
-  user-select: none;
-  box-shadow: var(--shadow-sm);
-}
-
-.badge-live-pulse {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
-}
-
-.badge-divider {
-  color: var(--text-3);
-  opacity: 0.6;
-}
-
-.badge-sub {
-  color: var(--text-3);
-}
-
-.welcome-theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text-2);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s var(--ease);
-  box-shadow: var(--shadow-sm);
-}
-
-.welcome-theme-toggle:hover {
-  background: var(--surface-hover);
-  color: var(--text);
-  border-color: var(--control-hover-border);
-}
-
-.theme-toggle-icon {
-  display: grid;
-  place-items: center;
-  width: 14px;
-  height: 14px;
-}
-
-.theme-toggle-icon svg {
-  width: 14px;
-  height: 14px;
-}
-
-/* Scrollable Welcome Canvas */
+/* Welcome Canvas Container */
+.welcome-container,
 .welcome-scroll-wrap {
   position: relative;
   z-index: 2;
@@ -611,9 +532,10 @@ svg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
+  padding: 32px 24px;
 }
 
+.welcome-content,
 .welcome-inner {
   max-width: 560px;
   width: 100%;
@@ -622,25 +544,26 @@ svg {
   align-items: center;
   text-align: center;
   margin: auto;
-  animation: welcomeFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: welcomeFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes welcomeFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-/* Brand Mark Presentation */
+/* 1. CJ Brand Mark Presentation */
+.welcome-brand-mark-wrap,
 .welcome-brand-showcase {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
@@ -653,14 +576,9 @@ svg {
   border: none;
   box-shadow: none;
   padding: 0;
-  transition: transform 0.25s var(--ease);
 }
 
-.welcome-mark-frame:hover {
-  transform: translateY(-2px);
-  border-color: transparent;
-}
-
+.welcome-brand-mark,
 .welcome-mark {
   display: block;
   width: 96px;
@@ -670,29 +588,35 @@ svg {
   border: none;
   outline: none;
   box-shadow: none;
-  filter: drop-shadow(0 4px 16px rgba(234, 88, 12, 0.14));
-  transition: filter 0.3s var(--ease);
+  filter: drop-shadow(0 8px 24px rgba(234, 88, 12, 0.18));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
+.welcome-brand-mark-wrap:hover .welcome-brand-mark,
 .welcome-mark-frame:hover .welcome-mark {
-  filter: drop-shadow(0 6px 22px rgba(234, 88, 12, 0.24));
+  transform: translateY(-2px) scale(1.02);
+  filter: drop-shadow(0 12px 28px rgba(234, 88, 12, 0.28));
 }
 
-/* Headings */
+/* 2. CodeJunc Wordmark & 3. Tagline */
+.welcome-typography,
 .welcome-headings {
-  margin-bottom: 28px;
+  margin-bottom: 34px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.welcome-wordmark,
 .welcome-title {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: clamp(2.85rem, 5.8vw, 3.85rem);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-size: clamp(2.9rem, 6.2vw, 4.1rem);
+  font-weight: 750;
+  letter-spacing: -0.038em;
+  line-height: 1.05;
   color: var(--text);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -701,24 +625,16 @@ svg {
 .welcome-tagline {
   margin: 0;
   font-family: 'Plus Jakarta Sans', var(--font-ui), sans-serif;
-  font-size: clamp(1.05rem, 1.8vw, 1.2rem);
+  font-size: clamp(1.05rem, 1.9vw, 1.25rem);
   font-weight: 450;
   letter-spacing: -0.012em;
   color: var(--text-2);
-  line-height: 1.5;
-  max-width: 460px;
+  line-height: 1.45;
+  max-width: 440px;
 }
 
-.welcome-desc {
-  margin: 0 auto;
-  font-size: 0.94rem;
-  color: var(--text-2);
-  line-height: 1.55;
-  max-width: 500px;
-  letter-spacing: -0.01em;
-}
-
-/* Primary CTA Button */
+/* 4. Single Primary CTA Button */
+.welcome-action-wrap,
 .welcome-actions {
   display: flex;
   align-items: center;
@@ -726,22 +642,26 @@ svg {
   margin-bottom: 0;
 }
 
+.welcome-cta-btn,
 .btn-welcome {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 24px;
-  background: linear-gradient(180deg, #F97316 0%, #EA580C 100%);
+  gap: 9px;
+  height: 46px;
+  padding: 0 28px;
+  background: linear-gradient(180deg, #FA7316 0%, #EA580C 100%);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
   font-family: 'Plus Jakarta Sans', var(--font-ui), sans-serif;
-  font-size: 14.5px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.012em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 1px 2px rgba(0, 0, 0, 0.12), 0 4px 14px -3px rgba(234, 88, 12, 0.38);
+  letter-spacing: -0.015em;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 6px 20px -3px rgba(234, 88, 12, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
   position: relative;
   overflow: hidden;
@@ -749,52 +669,82 @@ svg {
   user-select: none;
 }
 
+.welcome-cta-label,
 .btn-welcome .btn-welcome-text {
   line-height: 1;
 }
 
+.welcome-cta-arrow,
 .btn-welcome .arrow-glyph {
   font-size: 15px;
   line-height: 1;
   margin-left: 2px;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-block;
+  vertical-align: middle;
 }
 
-.welcome-kbd {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  color: #FFFFFF;
-  opacity: 0.9;
-  margin-left: 2px;
-}
-
+.welcome-cta-btn:hover,
 .btn-welcome:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 6px 18px -2px rgba(234, 88, 12, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.32);
-  filter: brightness(1.03);
+  transform: translateY(-1.5px);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.15),
+    0 10px 26px -2px rgba(234, 88, 12, 0.52),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  filter: brightness(1.04);
 }
 
+.welcome-cta-btn:hover .welcome-cta-arrow,
+.welcome-cta-btn:hover .arrow-glyph,
 .btn-welcome:hover .arrow-glyph {
   transform: translateX(3px);
 }
 
+.welcome-cta-btn:active,
 .btn-welcome:active {
-  transform: translateY(0);
+  transform: translateY(0.5px);
   filter: brightness(0.97);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 2px 8px -1px rgba(234, 88, 12, 0.3);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    0 3px 10px -1px rgba(234, 88, 12, 0.35);
 }
 
+.welcome-cta-btn:focus-visible,
 .btn-welcome:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+/* Light Theme Precision Tuning */
+[data-theme='light'] .welcome-ambient-glow {
+  opacity: 0.5;
+  background: radial-gradient(ellipse at center, rgba(249, 115, 22, 0.08) 0%, rgba(249, 115, 22, 0.02) 45%, transparent 70%);
+}
+
+[data-theme='light'] .welcome-brand-mark,
+[data-theme='light'] .welcome-mark {
+  filter: drop-shadow(0 6px 20px rgba(234, 88, 12, 0.14));
+}
+
+[data-theme='light'] .welcome-brand-mark-wrap:hover .welcome-brand-mark,
+[data-theme='light'] .welcome-mark-frame:hover .welcome-mark {
+  filter: drop-shadow(0 10px 24px rgba(234, 88, 12, 0.22));
+}
+
+[data-theme='light'] .welcome-cta-btn,
+[data-theme='light'] .btn-welcome {
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 6px 18px -3px rgba(234, 88, 12, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+[data-theme='light'] .welcome-cta-btn:hover,
+[data-theme='light'] .btn-welcome:hover {
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.1),
+    0 10px 24px -2px rgba(234, 88, 12, 0.44),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 /* Quick-Launch Language Bar */

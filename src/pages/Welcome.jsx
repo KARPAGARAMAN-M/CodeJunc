@@ -22,11 +22,11 @@ export default function Welcome() {
     };
   }, []);
 
-  // Listen for Enter key to trigger Start Coding
+  // Listen for Enter key to trigger Start Coding -> navigates to Language Selection
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key === 'Enter') {
-        navigate('/compiler');
+        navigate('/languages');
       }
     }
     window.addEventListener('keydown', handleKeyDown);
@@ -35,46 +35,63 @@ export default function Welcome() {
 
   return (
     <div className="welcome" aria-hidden="false">
-      {/* Background Technical Grid & Ambient Lighting */}
-      <div className="welcome-grid-bg" aria-hidden="true" />
+      {/* Background Architectural Canvas & Subtle Ambient Lighting */}
+      <div className="welcome-bg-canvas" aria-hidden="true" />
       <div className="welcome-ambient-glow" aria-hidden="true" />
 
       {/* Main Minimal Full-Screen Welcome Experience */}
-      <div className="welcome-scroll-wrap welcome-centered">
-        <div className="welcome-inner">
-          {/* 1. CJ Brand Mark (Primary visual element) */}
-          <div className="welcome-brand-showcase">
-            <div className="welcome-mark-frame">
-              <img
-                className="welcome-mark"
-                src="/assets/brand/brand-mark-transparent.png"
-                alt="CodeJunc Brand Mark"
-                width="96"
-                height="68"
-              />
-            </div>
+      <main className="welcome-container">
+        <div className="welcome-content">
+          {/* 1. CJ Brand Mark */}
+          <div className="welcome-brand-mark-wrap">
+            <img
+              className="welcome-brand-mark"
+              src="/assets/brand/brand-mark-transparent.png"
+              alt="CodeJunc"
+              width="96"
+              height="68"
+              draggable="false"
+            />
           </div>
 
           {/* 2. CodeJunc Wordmark & 3. Tagline */}
-          <div className="welcome-headings">
-            <h1 className="welcome-title">CodeJunc</h1>
+          <div className="welcome-typography">
+            <h1 className="welcome-wordmark">CodeJunc</h1>
             <p className="welcome-tagline">Code Without Distractions.</p>
           </div>
 
-          {/* 4. Single CTA: Start Coding → */}
-          <div className="welcome-actions">
+          {/* 4. Single CTA: Start Coding → (Navigates to Language Selection) */}
+          <div className="welcome-action-wrap">
             <button
-              className="btn-welcome"
+              className="welcome-cta-btn btn-welcome"
               type="button"
               title="Start coding (or press Enter)"
-              onClick={() => navigate('/compiler')}
+              onClick={() => navigate('/languages')}
+              aria-label="Start Coding"
             >
-              <span className="btn-welcome-text">Start Coding</span>
-              <span className="arrow-glyph" aria-hidden="true">→</span>
+              <span className="welcome-cta-label btn-welcome-text">Start Coding</span>
+              <svg
+                className="welcome-cta-arrow arrow-glyph"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3.33334 8H12.6667M12.6667 8L8.66668 4M12.6667 8L8.66668 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
+
