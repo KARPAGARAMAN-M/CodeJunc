@@ -101,44 +101,37 @@ Health check verifying the backend service status.
 
 ## 4. Setup and Execution
 
-### Prerequisites
-- **Java 21** or later
-- **Maven 3.9+**
-- **Node.js 18+** & npm
+### Quick Start (Single Command)
 
-### Starting the Backend (Spring Boot)
+Run both the Spring Boot backend and Vite frontend concurrently with one command from the project root:
 
-1. Open a terminal in the `backend/` directory:
-   ```bash
-   cd backend
-   ```
-2. (Optional) Configure environment variables in `.env` or pass to command line:
-   ```bash
-   # Defaults to public Judge0 CE (https://ce.judge0.com)
-   # If using RapidAPI:
-   # set JUDGE0_BASE_URL=https://judge0-ce.p.rapidapi.com
-   # set JUDGE0_API_KEY=your_rapidapi_key
-   # set JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
-   ```
-3. Run the application with Maven:
-   ```bash
-   mvn spring-boot:run
-   ```
-   Or run the pre-built JAR:
-   ```bash
-   java -jar target/codejunc-backend-1.0.0.jar
-   ```
-   The backend will start on **`http://localhost:8080`**.
+```bash
+npm run dev
+```
 
-### Starting the Frontend (React + Vite)
+This starts:
+- **Spring Boot Backend**: `http://localhost:8080` (with live logs prefixed with `[backend]`)
+- **React Frontend**: `http://localhost:3000` (with live logs prefixed with `[frontend]`)
+- Proxy: Calls from the frontend to `/api` are automatically proxied to port 8080.
 
-1. In the project root directory:
-   ```bash
-   npm install
-   npm run dev
-   ```
-2. Open your browser at **`http://localhost:3000`**.
-   Vite is configured with a reverse proxy for `/api` pointing to `http://localhost:8080`.
+Press `Ctrl + C` at any time to cleanly stop both processes.
+
+---
+
+### Running Services Separately (Optional)
+
+If you prefer to run services in separate terminal tabs:
+
+#### Starting the Spring Boot Backend
+```bash
+npm run dev:backend
+# or: cd backend && mvn spring-boot:run
+```
+
+#### Starting the React Frontend
+```bash
+npm run dev:frontend
+```
 
 ---
 
