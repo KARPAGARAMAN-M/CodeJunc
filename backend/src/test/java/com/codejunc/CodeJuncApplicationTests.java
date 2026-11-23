@@ -30,6 +30,7 @@ class CodeJuncApplicationTests {
 
     @Test
     void testHealthEndpoint() {
+        when(judge0Service.checkJudge0Health()).thenReturn(java.util.Map.of("status", "UP", "url", "https://ce.judge0.com"));
         ResponseEntity<String> response = restTemplate.getForEntity("/api/health", String.class);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue(response.getBody().contains("UP"));

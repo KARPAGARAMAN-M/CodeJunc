@@ -93,11 +93,24 @@ public class Judge0SubmissionResponse {
     }
 
     public Integer getStatusId() {
-        return statusId;
+        if (statusId != null) {
+            return statusId;
+        }
+        if (status != null && status.getId() != null) {
+            return status.getId();
+        }
+        return null;
     }
 
     public void setStatusId(Integer statusId) {
         this.statusId = statusId;
+    }
+
+    public String getStatusDescription() {
+        if (status != null && status.getDescription() != null) {
+            return status.getDescription();
+        }
+        return null;
     }
 
     public Judge0Status getStatus() {

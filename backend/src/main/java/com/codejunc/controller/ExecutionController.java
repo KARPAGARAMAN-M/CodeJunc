@@ -35,14 +35,18 @@ public class ExecutionController {
     }
 
     /**
-     * Health check endpoint to verify backend status.
+     * Health check endpoint to verify backend status and Judge0 connectivity.
      */
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> healthCheck() {
+        Map<String, Object> judge0Health = judge0Service.checkJudge0Health();
+        String overallStatus = "UP".equals(judge0Health.get("status")) ? "UP" : "DEGRADED";
+
         return ResponseEntity.ok(Map.of(
-                "status", "UP",
+                "status", overallStatus,
                 "service", "CodeJunc Backend",
-                "version", "1.0.0"
+                "version", "1.0.0",
+                "judge0", judge0Health
         ));
     }
 }

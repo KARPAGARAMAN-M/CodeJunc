@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class Judge0Service {
@@ -62,6 +65,7 @@ public class Judge0Service {
      * Execute code asynchronously via Judge0 and poll for the result.
      */
     public ExecuteResponse execute(ExecuteRequest request) {
+        String requestId = UUID.randomUUID().toString().substring(0, 8);
         Integer languageId = resolveLanguageId(request.getLanguage());
 
         String normalizedLang = request.getLanguage().trim().toLowerCase(Locale.ROOT);
@@ -72,8 +76,8 @@ public class Judge0Service {
         double wallLimit = properties.getWallTimeLimit();
         int memLimit = isJava ? properties.getJavaMemoryLimit() : properties.getMemoryLimit();
 
-        log.info("Submitting execution request for language: {} (Judge0 ID: {}, cpuLimit: {}s, wallLimit: {}s, memoryLimit: {}KB)",
-                request.getLanguage(), languageId, cpuLimit, wallLimit, memLimit);
+        log.info("[req:{}] Submitting execution for language: {} (Judge0 ID: {}, cpuLimit: {}s, wallLimit: {}s, memoryLimit: {}KB)",
+                requestId, request.getLanguage(), languageId, cpuLimit, wallLimit, memLimit);
 
         // 1. Submit code to Judge0
         Judge0SubmissionRequest submissionReq = new Judge0SubmissionRequest(
@@ -103,25 +107,39 @@ public class Judge0Service {
                     Judge0SubmissionResponse.class
             );
             initialResponse = responseEntity.getBody();
+        } catch (HttpStatusCodeException ex) {
+            String errorBody = ex.getResponseBodyAsString();
+            log.error("[req:{}] Judge0 returned HTTP {} at {}: {}", requestId, ex.getStatusCode(), submitUrl, errorBody);
+            if (ex.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                throw new ExecutionException("Execution provider rate limit exceeded. Please wait a moment and try again.");
+            } else if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED || ex.getStatusCode() == HttpStatus.FORBIDDEN) {
+                throw new ExecutionException("Execution service authentication failed. Please check backend API credentials.");
+            } else {
+                throw new ExecutionException("Execution service error (" + ex.getStatusCode().value() + "): " +
+                        (errorBody.isBlank() ? ex.getStatusText() : errorBody), ex);
+            }
+        } catch (ResourceAccessException ex) {
+            log.error("[req:{}] Network error connecting to Judge0 at {}: {}", requestId, submitUrl, ex.getMessage());
+            throw new ExecutionException("Network connection to execution service timed out or was unreachable.", ex);
         } catch (RestClientException ex) {
-            log.error("Failed to submit code to Judge0 at {}: {}", submitUrl, ex.getMessage());
-            throw new ExecutionException("Unable to connect to code execution service (Judge0): " + ex.getMessage(), ex);
+            log.error("[req:{}] Failed to submit code to Judge0 at {}: {}", requestId, submitUrl, ex.getMessage());
+            throw new ExecutionException("Unable to connect to code execution service: " + ex.getMessage(), ex);
         }
 
         if (initialResponse != null) {
+            Integer statusId = initialResponse.getStatusId();
             // If wait=true completed execution synchronously, return immediately (~1-3s)
-            if (initialResponse.getStatusId() != null && initialResponse.getStatusId() > 2) {
-                log.info("Execution completed synchronously for language {} with statusId {} ({})",
-                        request.getLanguage(), initialResponse.getStatusId(),
-                        initialResponse.getStatus() != null ? initialResponse.getStatus().getDescription() : "");
+            if (statusId != null && statusId > 2) {
+                log.info("[req:{}] Execution completed synchronously for language {} with statusId {} ({})",
+                        requestId, request.getLanguage(), statusId, initialResponse.getStatusDescription());
                 return mapToExecuteResponse(initialResponse);
             }
 
             // If still processing or in queue, poll using token
             if (initialResponse.getToken() != null) {
                 String token = initialResponse.getToken();
-                log.info("Submission queued by Judge0. Token: {}. Starting polling...", token);
-                Judge0SubmissionResponse finalResponse = pollSubmissionResult(token);
+                log.info("[req:{}] Submission queued by Judge0. Token: {}. Starting polling...", requestId, token);
+                Judge0SubmissionResponse finalResponse = pollSubmissionResult(token, requestId);
                 return mapToExecuteResponse(finalResponse);
             }
         }
@@ -129,7 +147,7 @@ public class Judge0Service {
         throw new ExecutionException("Execution service did not return a valid submission response.");
     }
 
-    private Judge0SubmissionResponse pollSubmissionResult(String token) {
+    private Judge0SubmissionResponse pollSubmissionResult(String token, String requestId) {
         String pollUrl = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
                 .path("/submissions/" + token)
                 .queryParam("base64_encoded", "false")
@@ -151,23 +169,23 @@ public class Judge0Service {
                 );
 
                 Judge0SubmissionResponse response = responseEntity.getBody();
-                if (response != null && response.getStatusId() != null) {
-                    int statusId = response.getStatusId();
-                    // Status 1: In Queue, Status 2: Processing
-                    if (statusId > 2) {
-                        log.info("Execution completed for token {} with statusId {} ({}) in attempt {}",
-                                token, statusId,
-                                response.getStatus() != null ? response.getStatus().getDescription() : "unknown",
-                                attempt);
+                if (response != null) {
+                    Integer statusId = response.getStatusId();
+                    if (statusId != null && statusId > 2) {
+                        log.info("[req:{}] Polled execution completed for token {} with statusId {} ({}) in attempt {}",
+                                requestId, token, statusId, response.getStatusDescription(), attempt);
                         return response;
                     }
-                    log.debug("Token {} is still {}. Attempt {}/{}...",
-                            token,
-                            statusId == 1 ? "In Queue" : "Processing",
+                    log.debug("[req:{}] Token {} status: {}. Attempt {}/{}...",
+                            requestId, token,
+                            statusId != null && statusId == 1 ? "In Queue" : "Processing",
                             attempt, maxAttempts);
                 }
+            } catch (HttpStatusCodeException ex) {
+                log.warn("[req:{}] HTTP {} while polling token {} on attempt {}: {}",
+                        requestId, ex.getStatusCode(), token, attempt, ex.getMessage());
             } catch (RestClientException ex) {
-                log.warn("Error polling token {} on attempt {}: {}", token, attempt, ex.getMessage());
+                log.warn("[req:{}] Error polling token {} on attempt {}: {}", requestId, token, attempt, ex.getMessage());
             }
 
             try {
@@ -178,12 +196,41 @@ public class Judge0Service {
             }
         }
 
-        log.warn("Execution polling completed without terminal status for token {}", token);
+        log.warn("[req:{}] Execution polling completed without terminal status for token {}", requestId, token);
         Judge0SubmissionResponse timeoutResp = new Judge0SubmissionResponse();
         timeoutResp.setStatusId(null);
         timeoutResp.setStatus(new Judge0SubmissionResponse.Judge0Status(null, "Backend Request Timeout"));
         timeoutResp.setMessage("The execution request timed out while waiting in queue on the execution service. Please try running again.");
         return timeoutResp;
+    }
+
+    /**
+     * Verify Judge0 service availability and connectivity.
+     */
+    public Map<String, Object> checkJudge0Health() {
+        String aboutUrl = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
+                .path("/about")
+                .toUriString();
+        try {
+            HttpHeaders headers = createHeaders();
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> resp = restTemplate.exchange(aboutUrl, HttpMethod.GET, entity, Map.class);
+            if (resp.getStatusCode().is2xxSuccessful() && resp.getBody() != null) {
+                return Map.of(
+                        "status", "UP",
+                        "url", properties.getBaseUrl(),
+                        "version", resp.getBody().getOrDefault("version", "unknown")
+                );
+            }
+            return Map.of("status", "DEGRADED", "url", properties.getBaseUrl());
+        } catch (Exception e) {
+            log.warn("Judge0 health check probe failed at {}: {}", aboutUrl, e.getMessage());
+            return Map.of(
+                    "status", "DOWN",
+                    "url", properties.getBaseUrl(),
+                    "error", e.getMessage()
+            );
+        }
     }
 
     private ExecuteResponse mapToExecuteResponse(Judge0SubmissionResponse judge0) {

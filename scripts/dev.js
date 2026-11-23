@@ -37,41 +37,40 @@ console.log(`${colors.gray}  Backend : Spring Boot 3 on http://localhost:8080${c
 console.log(`${colors.gray}  Frontend: Vite + React on http://localhost:3000${colors.reset}`);
 console.log(`${colors.green}${colors.bold}====================================================${colors.reset}\n`);
 
-// 1. Determine backend startup command
+// 1. Ensure port 8080 is clean before starting
+if (isWindows) {
+  try {
+    const netstatOut = execSync('netstat -ano | findstr :8080 | findstr LISTENING', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    const match = netstatOut.trim().split(/\s+/).pop();
+    if (match && !isNaN(parseInt(match))) {
+      console.log(`${colors.yellow}[dev] Freeing occupied port 8080 (PID ${match})...${colors.reset}`);
+      execSync(`taskkill /pid ${match} /T /F`, { stdio: 'ignore' });
+    }
+  } catch (e) {}
+}
+
+// 2. Determine backend startup command
 const jarPath = path.resolve(backendDir, 'target', 'codejunc-backend-1.0.0.jar');
 let backendCommand;
 let backendArgs;
 
-// Check if mvn command is accessible
-let hasMvn = false;
-try {
-  execSync(isWindows ? 'where mvn' : 'which mvn', { stdio: 'ignore' });
-  hasMvn = true;
-} catch (e) {
-  hasMvn = false;
-}
-
-if (hasMvn) {
-  backendCommand = isWindows ? 'mvn.cmd' : 'mvn';
-  backendArgs = ['spring-boot:run'];
-} else if (fs.existsSync(jarPath)) {
+if (fs.existsSync(jarPath)) {
   backendCommand = 'java';
   backendArgs = ['-jar', jarPath];
+} else if (isWindows) {
+  backendCommand = 'cmd.exe';
+  backendArgs = ['/d', '/s', '/c', 'mvn spring-boot:run'];
 } else {
-  backendCommand = isWindows ? 'mvn.cmd' : 'mvn';
+  backendCommand = 'mvn';
   backendArgs = ['spring-boot:run'];
 }
 
-// 2. Spawn Backend (Spring Boot)
-const backend = isWindows
-  ? spawn('cmd.exe', ['/d', '/s', '/c', 'mvn spring-boot:run'], {
-      cwd: backendDir,
-      stdio: ['inherit', 'pipe', 'pipe'],
-    })
-  : spawn('mvn', ['spring-boot:run'], {
-      cwd: backendDir,
-      stdio: ['inherit', 'pipe', 'pipe'],
-    });
+// 3. Spawn Backend (Spring Boot)
+const backend = spawn(backendCommand, backendArgs, {
+  cwd: backendDir,
+  shell: false,
+  stdio: ['inherit', 'pipe', 'pipe'],
+});
 
 backend.stdout.on('data', (d) => prefixLog('backend', colors.cyan, d));
 backend.stderr.on('data', (d) => prefixLog('backend', colors.yellow, d));
