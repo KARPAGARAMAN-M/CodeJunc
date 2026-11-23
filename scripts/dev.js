@@ -63,11 +63,15 @@ if (hasMvn) {
 }
 
 // 2. Spawn Backend (Spring Boot)
-const backend = spawn(backendCommand, backendArgs, {
-  cwd: backendDir,
-  shell: true,
-  stdio: ['inherit', 'pipe', 'pipe'],
-});
+const backend = isWindows
+  ? spawn('cmd.exe', ['/d', '/s', '/c', 'mvn spring-boot:run'], {
+      cwd: backendDir,
+      stdio: ['inherit', 'pipe', 'pipe'],
+    })
+  : spawn('mvn', ['spring-boot:run'], {
+      cwd: backendDir,
+      stdio: ['inherit', 'pipe', 'pipe'],
+    });
 
 backend.stdout.on('data', (d) => prefixLog('backend', colors.cyan, d));
 backend.stderr.on('data', (d) => prefixLog('backend', colors.yellow, d));
@@ -86,7 +90,7 @@ backend.on('close', (code) => {
 const vitePath = path.resolve(rootDir, 'node_modules', 'vite', 'bin', 'vite.js');
 const frontend = spawn(process.execPath, [vitePath], {
   cwd: rootDir,
-  shell: true,
+  shell: false,
   stdio: ['inherit', 'pipe', 'pipe'],
 });
 
