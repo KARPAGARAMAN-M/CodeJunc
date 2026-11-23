@@ -18,7 +18,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Welcome />} />
-          <Route path="/languages" element={<CompilerRedirect />} />
+          <Route path="/languages" element={<LanguageSelection />} />
           <Route path="/compiler/:language" element={<Compiler />} />
           <Route path="/compiler" element={<CompilerRedirect />} />
           <Route path="/documentation" element={<Documentation />} />

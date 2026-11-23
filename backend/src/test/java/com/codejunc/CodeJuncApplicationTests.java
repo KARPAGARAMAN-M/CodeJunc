@@ -63,4 +63,53 @@ class CodeJuncApplicationTests {
         assertEquals("Accepted", response.getBody().getStatus());
         assertEquals("Hello World\n", response.getBody().getStdout());
     }
+
+    @Test
+    void testCompilationErrorHandling() {
+        ExecuteResponse mockResponse = ExecuteResponse.builder()
+                .status("Compilation Error")
+                .compileOutput("Main.java:3: error: ';' expected")
+                .build();
+
+        when(judge0Service.execute(any(ExecuteRequest.class))).thenReturn(mockResponse);
+
+        ExecuteRequest req = new ExecuteRequest("java", "public class Main { int x }", "");
+        ResponseEntity<ExecuteResponse> response = restTemplate.postForEntity("/api/execute", req, ExecuteResponse.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Compilation Error", response.getBody().getStatus());
+        assertTrue(response.getBody().getCompileOutput().contains("error"));
+    }
+
+    @Test
+    void testTimeLimitExceededHandling() {
+        ExecuteResponse mockResponse = ExecuteResponse.builder()
+                .status("Time Limit Exceeded")
+                .message("Time limit exceeded")
+                .build();
+
+        when(judge0Service.execute(any(ExecuteRequest.class))).thenReturn(mockResponse);
+
+        ExecuteRequest req = new ExecuteRequest("python", "while True: pass", "");
+        ResponseEntity<ExecuteResponse> response = restTemplate.postForEntity("/api/execute", req, ExecuteResponse.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Time Limit Exceeded", response.getBody().getStatus());
+    }
+
+    @Test
+    void testStdinHandling() {
+        ExecuteResponse mockResponse = ExecuteResponse.builder()
+                .status("Accepted")
+                .stdout("Hello Karpagaram\n")
+                .build();
+
+        when(judge0Service.execute(any(ExecuteRequest.class))).thenReturn(mockResponse);
+
+        ExecuteRequest req = new ExecuteRequest("python", "name = input(); print('Hello', name)", "Karpagaram");
+        ResponseEntity<ExecuteResponse> response = restTemplate.postForEntity("/api/execute", req, ExecuteResponse.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Hello Karpagaram\n", response.getBody().getStdout());
+    }
 }
