@@ -22,13 +22,13 @@ judge0:
   wall-time-limit: 15.0
   memory-limit: 512000
   java-memory-limit: 512000
-  # Default verified language IDs for Judge0 CE
+  # Verified fast language IDs for Judge0 CE (1.14.0)
   languages:
-    c: 50
-    cpp: 54
-    java: 62
-    python: 71
-    javascript: 63
+    c: 103
+    cpp: 105
+    java: 91
+    python: 92
+    javascript: 93
 
 logging:
   level:

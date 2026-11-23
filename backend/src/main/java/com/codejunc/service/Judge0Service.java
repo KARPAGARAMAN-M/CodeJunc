@@ -88,7 +88,7 @@ public class Judge0Service {
         String submitUrl = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
                 .path("/submissions")
                 .queryParam("base64_encoded", "false")
-                .queryParam("wait", "false")
+                .queryParam("wait", "true")
                 .toUriString();
 
         HttpHeaders headers = createHeaders();
@@ -108,21 +108,25 @@ public class Judge0Service {
             throw new ExecutionException("Unable to connect to code execution service (Judge0): " + ex.getMessage(), ex);
         }
 
-        if (initialResponse == null || initialResponse.getToken() == null) {
-            // Check if Judge0 returned result immediately
-            if (initialResponse != null && initialResponse.getStatus() != null && initialResponse.getStatusId() != null && initialResponse.getStatusId() > 2) {
+        if (initialResponse != null) {
+            // If wait=true completed execution synchronously, return immediately (~1-3s)
+            if (initialResponse.getStatusId() != null && initialResponse.getStatusId() > 2) {
+                log.info("Execution completed synchronously for language {} with statusId {} ({})",
+                        request.getLanguage(), initialResponse.getStatusId(),
+                        initialResponse.getStatus() != null ? initialResponse.getStatus().getDescription() : "");
                 return mapToExecuteResponse(initialResponse);
             }
-            throw new ExecutionException("Execution service did not return a valid submission token.");
+
+            // If still processing or in queue, poll using token
+            if (initialResponse.getToken() != null) {
+                String token = initialResponse.getToken();
+                log.info("Submission queued by Judge0. Token: {}. Starting polling...", token);
+                Judge0SubmissionResponse finalResponse = pollSubmissionResult(token);
+                return mapToExecuteResponse(finalResponse);
+            }
         }
 
-        String token = initialResponse.getToken();
-        log.info("Submission accepted by Judge0. Token: {}. Starting polling...", token);
-
-        // 2. Poll for execution result
-        Judge0SubmissionResponse finalResponse = pollSubmissionResult(token);
-
-        return mapToExecuteResponse(finalResponse);
+        throw new ExecutionException("Execution service did not return a valid submission response.");
     }
 
     private Judge0SubmissionResponse pollSubmissionResult(String token) {

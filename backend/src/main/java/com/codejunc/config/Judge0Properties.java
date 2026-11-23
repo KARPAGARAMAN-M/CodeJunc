@@ -29,12 +29,12 @@ public class Judge0Properties {
     private Map<String, Integer> languages = new HashMap<>();
 
     public Judge0Properties() {
-        // Defaults for Judge0 CE
-        languages.put("c", 50);
-        languages.put("cpp", 54);
-        languages.put("java", 62);
-        languages.put("python", 71);
-        languages.put("javascript", 63);
+        // Defaults for Judge0 CE (fast modern runtimes)
+        languages.put("c", 103);
+        languages.put("cpp", 105);
+        languages.put("java", 91);
+        languages.put("python", 92);
+        languages.put("javascript", 93);
     }
 
     public String getBaseUrl() {
