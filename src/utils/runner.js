@@ -123,8 +123,8 @@ export async function runCode({ language, code, stdin = '', onOutput }) {
       };
     }
 
-    // 6. Time limit exceeded
-    if (statusDesc.toLowerCase().includes('time limit')) {
+    // 6. Time limit exceeded (execution exceeded allowed runtime limit)
+    if (statusDesc === 'Time Limit Exceeded' || (statusDesc.toLowerCase().includes('time limit') && !statusDesc.toLowerCase().includes('backend'))) {
       return {
         output: data.stdout || '',
         error: 'Time Limit Exceeded: The program took longer to run than the allowed execution time limit.',
@@ -143,7 +143,17 @@ export async function runCode({ language, code, stdin = '', onOutput }) {
       };
     }
 
-    // 8. Runtime error or other execution failures
+    // 8. Backend / Queue polling timeout
+    if (statusDesc.toLowerCase().includes('timeout')) {
+      return {
+        output: data.stdout || '',
+        error: data.message || 'Request Timeout: The execution took longer than expected to complete on the execution service. Please try running again.',
+        status: 'error',
+        executionTimeMs,
+      };
+    }
+
+    // 9. Runtime error or other execution failures
     return {
       output: data.stdout || '',
       error: data.stderr || data.message || statusDesc,

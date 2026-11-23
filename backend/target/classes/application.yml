@@ -14,12 +14,14 @@ judge0:
   base-url: ${JUDGE0_BASE_URL:https://ce.judge0.com}
   api-key: ${JUDGE0_API_KEY:}
   api-host: ${JUDGE0_API_HOST:}
-  connect-timeout-ms: 5000
-  read-timeout-ms: 10000
-  poll-interval-ms: 500
-  poll-max-attempts: 20
-  cpu-time-limit: 5.0
-  memory-limit: 128000
+  connect-timeout-ms: 10000
+  read-timeout-ms: 30000
+  poll-interval-ms: 800
+  poll-max-attempts: 40
+  cpu-time-limit: 10.0
+  wall-time-limit: 15.0
+  memory-limit: 512000
+  java-memory-limit: 512000
   # Default verified language IDs for Judge0 CE
   languages:
     c: 50

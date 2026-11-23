@@ -64,16 +64,25 @@ public class Judge0Service {
     public ExecuteResponse execute(ExecuteRequest request) {
         Integer languageId = resolveLanguageId(request.getLanguage());
 
-        log.info("Submitting execution request for language: {} (Judge0 ID: {})",
-                request.getLanguage(), languageId);
+        String normalizedLang = request.getLanguage().trim().toLowerCase(Locale.ROOT);
+        boolean isJava = normalizedLang.equals("java");
+
+        // Java JVM requires adequate memory and execution allowance for compilation and VM startup
+        double cpuLimit = isJava ? properties.getCpuTimeLimit() : 5.0;
+        double wallLimit = properties.getWallTimeLimit();
+        int memLimit = isJava ? properties.getJavaMemoryLimit() : properties.getMemoryLimit();
+
+        log.info("Submitting execution request for language: {} (Judge0 ID: {}, cpuLimit: {}s, wallLimit: {}s, memoryLimit: {}KB)",
+                request.getLanguage(), languageId, cpuLimit, wallLimit, memLimit);
 
         // 1. Submit code to Judge0
         Judge0SubmissionRequest submissionReq = new Judge0SubmissionRequest(
                 request.getSourceCode(),
                 languageId,
                 request.getStdin() != null ? request.getStdin() : "",
-                properties.getCpuTimeLimit(),
-                properties.getMemoryLimit()
+                cpuLimit,
+                wallLimit,
+                memLimit
         );
 
         String submitUrl = UriComponentsBuilder.fromHttpUrl(properties.getBaseUrl())
@@ -101,7 +110,7 @@ public class Judge0Service {
 
         if (initialResponse == null || initialResponse.getToken() == null) {
             // Check if Judge0 returned result immediately
-            if (initialResponse != null && initialResponse.getStatus() != null) {
+            if (initialResponse != null && initialResponse.getStatus() != null && initialResponse.getStatusId() != null && initialResponse.getStatusId() > 2) {
                 return mapToExecuteResponse(initialResponse);
             }
             throw new ExecutionException("Execution service did not return a valid submission token.");
@@ -148,6 +157,10 @@ public class Judge0Service {
                                 attempt);
                         return response;
                     }
+                    log.debug("Token {} is still {}. Attempt {}/{}...",
+                            token,
+                            statusId == 1 ? "In Queue" : "Processing",
+                            attempt, maxAttempts);
                 }
             } catch (RestClientException ex) {
                 log.warn("Error polling token {} on attempt {}: {}", token, attempt, ex.getMessage());
@@ -161,11 +174,11 @@ public class Judge0Service {
             }
         }
 
-        log.warn("Execution timed out waiting for token {}", token);
+        log.warn("Execution polling completed without terminal status for token {}", token);
         Judge0SubmissionResponse timeoutResp = new Judge0SubmissionResponse();
-        timeoutResp.setStatusId(5); // Time Limit Exceeded
-        timeoutResp.setStatus(new Judge0SubmissionResponse.Judge0Status(5, "Time Limit Exceeded"));
-        timeoutResp.setMessage("Execution timed out while waiting for output from Judge0.");
+        timeoutResp.setStatusId(null);
+        timeoutResp.setStatus(new Judge0SubmissionResponse.Judge0Status(null, "Backend Request Timeout"));
+        timeoutResp.setMessage("The execution request timed out while waiting in queue on the execution service. Please try running again.");
         return timeoutResp;
     }
 
@@ -181,6 +194,11 @@ public class Judge0Service {
         String stderr = decodeIfBase64(judge0.getStderr());
         String compileOutput = decodeIfBase64(judge0.getCompileOutput());
         String message = decodeIfBase64(judge0.getMessage());
+
+        // For compilation errors, ensure compileOutput is populated even if returned in stderr
+        if ("Compilation Error".equalsIgnoreCase(statusDescription) && (compileOutput == null || compileOutput.isBlank())) {
+            compileOutput = stderr != null ? stderr : message;
+        }
 
         return ExecuteResponse.builder()
                 .status(statusDescription)

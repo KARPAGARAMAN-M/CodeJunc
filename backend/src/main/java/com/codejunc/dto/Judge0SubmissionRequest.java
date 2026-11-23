@@ -16,18 +16,30 @@ public class Judge0SubmissionRequest {
     @JsonProperty("cpu_time_limit")
     private Double cpuTimeLimit;
 
+    @JsonProperty("wall_time_limit")
+    private Double wallTimeLimit;
+
     @JsonProperty("memory_limit")
     private Integer memoryLimit;
 
     public Judge0SubmissionRequest() {
     }
 
-    public Judge0SubmissionRequest(String sourceCode, Integer languageId, String stdin, Double cpuTimeLimit, Integer memoryLimit) {
+    public Judge0SubmissionRequest(String sourceCode, Integer languageId, String stdin, Double cpuTimeLimit, Double wallTimeLimit, Integer memoryLimit) {
         this.sourceCode = sourceCode;
         this.languageId = languageId;
         this.stdin = stdin;
         this.cpuTimeLimit = cpuTimeLimit;
+        this.wallTimeLimit = wallTimeLimit;
         this.memoryLimit = memoryLimit;
+    }
+
+    public Double getWallTimeLimit() {
+        return wallTimeLimit;
+    }
+
+    public void setWallTimeLimit(Double wallTimeLimit) {
+        this.wallTimeLimit = wallTimeLimit;
     }
 
     public String getSourceCode() {

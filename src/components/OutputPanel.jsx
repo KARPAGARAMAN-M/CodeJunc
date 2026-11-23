@@ -26,6 +26,16 @@ export default function OutputPanel({
   const hasError = error && error.trim().length > 0;
   const isRunning = status === 'running';
 
+  const getErrorTypeBadge = (errText) => {
+    if (!errText) return 'ERROR';
+    if (/time limit/i.test(errText)) return 'TIME LIMIT EXCEEDED';
+    if (/memory limit/i.test(errText)) return 'MEMORY LIMIT EXCEEDED';
+    if (/timeout/i.test(errText)) return 'REQUEST TIMEOUT';
+    if (/service error|connect|network error|execution service/i.test(errText)) return 'SERVICE ERROR';
+    if (/compile|syntaxerror|javac|gcc|g\+\+|declaration not found|undefined reference/i.test(errText)) return 'COMPILATION ERROR';
+    return 'RUNTIME ERROR';
+  };
+
   const getStatusChip = () => {
     if (isRunning) {
       return <span className="status-chip is-running" role="status">Running</span>;
@@ -133,9 +143,7 @@ export default function OutputPanel({
             {hasError && (
               <div className="output-errors">
                 <div className="error-badge">
-                  {/compile|syntaxerror|javac|gcc|g\+\+|error:|undefined reference|declaration not found/i.test(error)
-                    ? 'COMPILATION ERROR'
-                    : 'RUNTIME ERROR'}
+                  {getErrorTypeBadge(error)}
                 </div>
                 <pre>{error}</pre>
               </div>

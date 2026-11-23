@@ -13,12 +13,14 @@ public class Judge0Properties {
     private String baseUrl = "https://ce.judge0.com";
     private String apiKey = "";
     private String apiHost = "";
-    private int connectTimeoutMs = 5000;
-    private int readTimeoutMs = 10000;
-    private int pollIntervalMs = 500;
-    private int pollMaxAttempts = 20;
-    private double cpuTimeLimit = 5.0;
-    private int memoryLimit = 128000;
+    private int connectTimeoutMs = 10000;
+    private int readTimeoutMs = 30000;
+    private int pollIntervalMs = 800;
+    private int pollMaxAttempts = 40;
+    private double cpuTimeLimit = 10.0;
+    private double wallTimeLimit = 15.0;
+    private int memoryLimit = 512000;
+    private int javaMemoryLimit = 512000;
 
     /**
      * Map of normalized language keys to Judge0 language IDs.
@@ -97,6 +99,22 @@ public class Judge0Properties {
 
     public void setCpuTimeLimit(double cpuTimeLimit) {
         this.cpuTimeLimit = cpuTimeLimit;
+    }
+
+    public double getWallTimeLimit() {
+        return wallTimeLimit;
+    }
+
+    public void setWallTimeLimit(double wallTimeLimit) {
+        this.wallTimeLimit = wallTimeLimit;
+    }
+
+    public int getJavaMemoryLimit() {
+        return javaMemoryLimit;
+    }
+
+    public void setJavaMemoryLimit(int javaMemoryLimit) {
+        this.javaMemoryLimit = javaMemoryLimit;
     }
 
     public int getMemoryLimit() {
