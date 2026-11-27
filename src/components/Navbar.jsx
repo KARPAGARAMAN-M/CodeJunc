@@ -27,12 +27,6 @@ export default function Navbar({ children, activeLanguage = 'python', isWorkspac
         {!isWorkspace && (
           <nav className="topbar-nav" aria-label="Main Navigation">
             <NavLink
-              to="/languages"
-              className={({ isActive }) => `topbar-nav-link ${isActive ? 'active' : ''}`}
-            >
-              Languages
-            </NavLink>
-            <NavLink
               to={`/compiler/${currentLang}`}
               className={({ isActive }) => `topbar-nav-link ${isActive ? 'active' : ''}`}
             >

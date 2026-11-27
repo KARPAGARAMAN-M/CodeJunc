@@ -25,7 +25,7 @@ export const LANGUAGE_ICONS = {
   </svg>`,
 };
 
-export const DEFAULT_LANGUAGE = 'c';
+export const DEFAULT_LANGUAGE = 'python';
 
 export const LANGUAGES = {
   c: {
@@ -43,7 +43,7 @@ export const LANGUAGES = {
     starter:
       '#include <stdio.h>\n\n' +
       'int main() {\n' +
-      '    printf("Hello, World!\\n");\n' +
+      '    printf("Hello World\\n");\n' +
       '    return 0;\n' +
       '}\n',
   },
@@ -62,7 +62,7 @@ export const LANGUAGES = {
     starter:
       '#include <iostream>\n\n' +
       'int main() {\n' +
-      '    std::cout << "Hello, World!" << std::endl;\n' +
+      '    std::cout << "Hello World" << std::endl;\n' +
       '    return 0;\n' +
       '}\n',
   },
@@ -81,7 +81,7 @@ export const LANGUAGES = {
     starter:
       'public class Main {\n' +
       '    public static void main(String[] args) {\n' +
-      '        System.out.println("Hello, World!");\n' +
+      '        System.out.println("Hello World");\n' +
       '    }\n' +
       '}\n',
   },
@@ -97,7 +97,7 @@ export const LANGUAGES = {
     pistonVersion: '3.10.0',
     color: '#3776ab',
     icon: LANGUAGE_ICONS.python,
-    starter: 'print("Hello, World!")\n',
+    starter: 'print("Hello World")\n',
   },
   javascript: {
     id: 'javascript',
@@ -111,7 +111,7 @@ export const LANGUAGES = {
     pistonVersion: '18.15.0',
     color: '#e8c500',
     icon: LANGUAGE_ICONS.javascript,
-    starter: 'console.log("Hello, World!");\n',
+    starter: 'console.log("Hello World");\n',
   },
 };
 

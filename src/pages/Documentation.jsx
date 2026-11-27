@@ -30,7 +30,7 @@ export default function Documentation() {
         <article className="docs-article">
           <div className="docs-header">
             <span className="page-badge">DEVELOPER GUIDE</span>
-            <h1 className="docs-title">CodeJunc Documentation</h1>
+            <h1 className="docs-title"><span className="brand-code">Code</span><span className="brand-junc">Junc</span> Documentation</h1>
             <p className="docs-lead">
               Everything you need to know about developing, testing, and running code in CodeJunc's zero-setup client-side coding platform.
             </p>

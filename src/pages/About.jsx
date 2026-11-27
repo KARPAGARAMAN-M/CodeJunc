@@ -9,10 +9,10 @@ export default function About() {
 
       <main className="page-content about-layout">
         <div className="about-hero">
-          <div className="page-badge">THE CODEJUNC MISSION</div>
+          <div className="page-badge">THE <span className="brand-code">CODE</span><span className="brand-junc">JUNC</span> MISSION</div>
           <h1 className="about-title">Code Without Distractions.</h1>
           <p className="about-lead">
-            CodeJunc is an online compiler and development playground built from the ground up for speed, focus, and simplicity. No complex setup, no ads, no mandatory signups — just pure coding.
+            <span className="brand-code">Code</span><span className="brand-junc">Junc</span> is an online compiler and development playground built from the ground up for speed, focus, and simplicity. No complex setup, no ads, no mandatory signups — just pure coding.
           </p>
         </div>
 

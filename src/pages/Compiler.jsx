@@ -7,6 +7,10 @@ import OutputPanel from '../components/OutputPanel';
 import { LANGUAGES, getLanguage, DEFAULT_LANGUAGE } from '../utils/languages';
 import { runCode } from '../utils/runner';
 
+// Inactivity session expiration timeout (30 minutes)
+const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000;
+const SESSION_ACTIVITY_KEY = 'cj.session.lastActivity';
+
 export default function Compiler() {
   const { language: langParam } = useParams();
   const navigate = useNavigate();
@@ -23,19 +27,23 @@ export default function Compiler() {
     };
   }, []);
 
+  // Clean up any legacy saved code from older versions of CodeJunc
+  useEffect(() => {
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('cj.code.')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (e) {}
+  }, []);
+
   // Language Dropdown open state
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef(null);
 
-  // Code state per language (persisted in localStorage)
-  const [code, setCode] = useState(() => {
-    try {
-      const saved = localStorage.getItem(`cj.code.${activeLangKey}`);
-      return saved !== null ? saved : currentLanguage.starter;
-    } catch (e) {
-      return currentLanguage.starter;
-    }
-  });
+  // Code state per language (fresh default code; no persistence across sessions or languages)
+  const [code, setCode] = useState(currentLanguage.starter);
 
   // Stdin state
   const [stdin, setStdin] = useState('');
@@ -59,6 +67,93 @@ export default function Compiler() {
     }, 2400);
   };
 
+  // Activity tracking for 30-minute session expiration
+  const lastActivityRef = useRef(Date.now());
+
+  const recordActivity = () => {
+    const now = Date.now();
+    lastActivityRef.current = now;
+    try {
+      sessionStorage.setItem(SESSION_ACTIVITY_KEY, String(now));
+    } catch (e) {}
+  };
+
+  // Reset workspace state to default Hello World starter
+  const resetToDefaultCode = (reason) => {
+    setCode(currentLanguage.starter);
+    setOutput('');
+    setError('');
+    setNotes([]);
+    setStatus('idle');
+    setExecutionTime(null);
+    if (reason) {
+      showToast(reason);
+    }
+  };
+
+  // Check if session has expired due to 30 minutes of inactivity
+  const checkSessionExpiration = () => {
+    const now = Date.now();
+    let lastTime = lastActivityRef.current;
+    try {
+      const stored = sessionStorage.getItem(SESSION_ACTIVITY_KEY);
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+          lastTime = Math.max(lastTime, parsed);
+        }
+      }
+    } catch (e) {}
+
+    if (now - lastTime >= INACTIVITY_TIMEOUT_MS) {
+      resetToDefaultCode('Session expired due to 30 minutes of inactivity. Default code restored.');
+      recordActivity();
+      return true;
+    }
+    return false;
+  };
+
+  // Periodic inactivity check (every 10s) and check on tab resume / focus
+  useEffect(() => {
+    checkSessionExpiration();
+
+    const intervalId = setInterval(() => {
+      checkSessionExpiration();
+    }, 10000);
+
+    const handleResume = () => {
+      checkSessionExpiration();
+    };
+
+    window.addEventListener('focus', handleResume);
+    document.addEventListener('visibilitychange', handleResume);
+
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener('focus', handleResume);
+      document.removeEventListener('visibilitychange', handleResume);
+    };
+  }, [currentLanguage]);
+
+  // Global user activity listeners (throttled)
+  useEffect(() => {
+    let lastRecorded = 0;
+    const handleUserInteraction = () => {
+      const now = Date.now();
+      if (now - lastRecorded > 1500) {
+        lastRecorded = now;
+        recordActivity();
+      }
+    };
+
+    const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach((ev) => window.addEventListener(ev, handleUserInteraction, { passive: true }));
+
+    return () => {
+      events.forEach((ev) => window.removeEventListener(ev, handleUserInteraction));
+    };
+  }, []);
+
   // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(e) {
@@ -81,44 +176,40 @@ export default function Compiler() {
     }
   }, [langParam, activeLangKey, navigate]);
 
-  // Switch language code when active language changes
+  // Switch language code when active language changes -> always load fresh Hello World default code
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(`cj.code.${activeLangKey}`);
-      setCode(saved !== null ? saved : currentLanguage.starter);
-    } catch (e) {
-      setCode(currentLanguage.starter);
-    }
+    setCode(currentLanguage.starter);
     setOutput('');
     setError('');
+    setNotes([]);
     setStatus('idle');
     setExecutionTime(null);
+    recordActivity();
   }, [activeLangKey, currentLanguage]);
 
-  // Persist code on change
+  // Code editor change handler (in-memory only; no localStorage persistence)
   const handleCodeChange = (newCode) => {
     setCode(newCode);
-    try {
-      localStorage.setItem(`cj.code.${activeLangKey}`, newCode);
-    } catch (e) {}
+    recordActivity();
   };
 
   // Reset starter code
   const handleReset = () => {
-    setCode(currentLanguage.starter);
-    try {
-      localStorage.setItem(`cj.code.${activeLangKey}`, currentLanguage.starter);
-    } catch (e) {}
-    showToast('Starter code restored');
+    resetToDefaultCode('Starter code restored');
+    recordActivity();
   };
 
   // Clear code
   const handleClearCode = () => {
     setCode('');
-    try {
-      localStorage.setItem(`cj.code.${activeLangKey}`, '');
-    } catch (e) {}
+    recordActivity();
     showToast('Editor cleared');
+  };
+
+  // Stdin change handler
+  const handleStdinChange = (newStdin) => {
+    setStdin(newStdin);
+    recordActivity();
   };
 
   // Copy output
@@ -139,10 +230,12 @@ export default function Compiler() {
     setNotes([]);
     setStatus('idle');
     setExecutionTime(null);
+    recordActivity();
   };
 
   // Run code handler
   const handleRun = async () => {
+    recordActivity();
     if (status === 'running') return;
 
     setStatus('running');
@@ -363,7 +456,7 @@ export default function Compiler() {
           status={status}
           executionTime={executionTime}
           stdin={stdin}
-          setStdin={setStdin}
+          setStdin={handleStdinChange}
           onClear={handleClearOutput}
           onCopy={handleCopyOutput}
           activeLanguage={currentLanguage}

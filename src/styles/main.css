@@ -463,9 +463,13 @@ svg {
 }
 
 /* ============================================================
-   WELCOME PAGE — Premium Developer Product Experience
-   Strictly focused: Brand Mark, Wordmark, Tagline, Start Coding CTA
-   Precision-crafted typography, ambient lighting, architectural depth
+   WELCOME PAGE — Premium Reference Design
+   - Deep dark obsidian canvas
+   - Fluid dark contour curves with glowing neon orange rim
+   - Subtle giant watermark on the right
+   - CodeJunc wordmark (Code in pure white, Junc in vibrant orange)
+   - Refined tagline ("Code Without Distractions.")
+   - Radiant orange pill CTA ("Start Coding →" with dark text)
    ============================================================ */
 .welcome {
   position: fixed;
@@ -475,7 +479,7 @@ svg {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg);
+  background: #0B0C10;
   color: var(--text);
   overflow: hidden;
   font-family: 'Plus Jakarta Sans', var(--font-ui), sans-serif;
@@ -489,34 +493,38 @@ svg {
   visibility: hidden;
 }
 
-/* Background Engineering Canvas & Vignette */
+/* Background Canvas & Fluid SVG Overlay */
 .welcome-bg-canvas,
 .welcome-grid-bg {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 1;
-  background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 52px 52px;
-  mask-image: radial-gradient(ellipse 65% 55% at 50% 48%, black 15%, transparent 75%);
-  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 48%, black 15%, transparent 75%);
+  overflow: hidden;
 }
 
-/* Premium Warm Ambient Glow */
+.welcome-fluid-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Warm Radiant Ambient Glow in Center */
 .welcome-ambient-glow {
   position: absolute;
   top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 580px;
-  height: 380px;
+  width: 640px;
+  height: 420px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(249, 115, 22, 0.12) 0%, rgba(249, 115, 22, 0.035) 45%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(255, 122, 0, 0.16) 0%, rgba(234, 88, 12, 0.04) 50%, transparent 75%);
   pointer-events: none;
   filter: blur(80px);
-  z-index: 1;
+  z-index: 2;
   transition: opacity 0.3s ease;
 }
 
@@ -524,7 +532,7 @@ svg {
 .welcome-container,
 .welcome-scroll-wrap {
   position: relative;
-  z-index: 2;
+  z-index: 10;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -537,7 +545,7 @@ svg {
 
 .welcome-content,
 .welcome-inner {
-  max-width: 560px;
+  max-width: 580px;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -561,7 +569,7 @@ svg {
 /* 1. CJ Brand Mark Presentation */
 .welcome-brand-mark-wrap,
 .welcome-brand-showcase {
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -581,14 +589,14 @@ svg {
 .welcome-brand-mark,
 .welcome-mark {
   display: block;
-  width: 96px;
+  width: 102px;
   height: auto;
   object-fit: contain;
   background: transparent;
   border: none;
   outline: none;
   box-shadow: none;
-  filter: drop-shadow(0 8px 24px rgba(234, 88, 12, 0.18));
+  filter: drop-shadow(0 0 24px rgba(249, 115, 22, 0.45));
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
   -webkit-user-drag: none;
@@ -597,7 +605,7 @@ svg {
 .welcome-brand-mark-wrap:hover .welcome-brand-mark,
 .welcome-mark-frame:hover .welcome-mark {
   transform: translateY(-2px) scale(1.02);
-  filter: drop-shadow(0 12px 28px rgba(234, 88, 12, 0.28));
+  filter: drop-shadow(0 0 32px rgba(249, 115, 22, 0.65));
 }
 
 /* 2. CodeJunc Wordmark & 3. Tagline */
@@ -613,27 +621,35 @@ svg {
 .welcome-title {
   margin: 0 0 10px;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: clamp(2.9rem, 6.2vw, 4.1rem);
+  font-size: clamp(3.2rem, 7vw, 4.4rem);
   font-weight: 750;
-  letter-spacing: -0.038em;
+  letter-spacing: -0.035em;
   line-height: 1.05;
-  color: var(--text);
+  color: #FFFFFF;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+.welcome-wordmark-code {
+  color: #FFFFFF;
+}
+
+.welcome-wordmark-junc {
+  color: #FF7700;
 }
 
 .welcome-tagline {
   margin: 0;
   font-family: 'Plus Jakarta Sans', var(--font-ui), sans-serif;
   font-size: clamp(1.05rem, 1.9vw, 1.25rem);
-  font-weight: 450;
-  letter-spacing: -0.012em;
-  color: var(--text-2);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  color: #9CA3AF;
   line-height: 1.45;
   max-width: 440px;
 }
 
-/* 4. Single Primary CTA Button */
+/* 4. Single Primary CTA Button (Pill with Glowing Orange Fill) */
 .welcome-action-wrap,
 .welcome-actions {
   display: flex;
@@ -647,21 +663,20 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  height: 46px;
+  gap: 8px;
+  height: 44px;
   padding: 0 28px;
-  background: linear-gradient(180deg, #FA7316 0%, #EA580C 100%);
-  color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
+  background: linear-gradient(180deg, #FF8000 0%, #EA580C 100%);
+  color: #0B0E14;
+  border: none;
+  border-radius: 9999px;
   font-family: 'Plus Jakarta Sans', var(--font-ui), sans-serif;
   font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.015em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.12),
-    0 6px 20px -3px rgba(234, 88, 12, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    0 0 28px rgba(255, 122, 0, 0.58),
+    0 4px 14px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
   position: relative;
   overflow: hidden;
@@ -672,13 +687,16 @@ svg {
 .welcome-cta-label,
 .btn-welcome .btn-welcome-text {
   line-height: 1;
+  color: #0B0E14;
 }
 
 .welcome-cta-arrow,
 .btn-welcome .arrow-glyph {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1;
   margin-left: 2px;
+  color: #0B0E14;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-block;
   vertical-align: middle;
@@ -686,11 +704,10 @@ svg {
 
 .welcome-cta-btn:hover,
 .btn-welcome:hover {
-  transform: translateY(-1.5px);
+  transform: translateY(-1.5px) scale(1.02);
   box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.15),
-    0 10px 26px -2px rgba(234, 88, 12, 0.52),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    0 0 36px rgba(255, 122, 0, 0.75),
+    0 6px 20px rgba(0, 0, 0, 0.4);
   filter: brightness(1.04);
 }
 
@@ -705,13 +722,13 @@ svg {
   transform: translateY(0.5px);
   filter: brightness(0.97);
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.2),
-    0 3px 10px -1px rgba(234, 88, 12, 0.35);
+    0 0 20px rgba(255, 122, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .welcome-cta-btn:focus-visible,
 .btn-welcome:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid #FF7700;
   outline-offset: 3px;
 }
 
@@ -1077,6 +1094,16 @@ body.is-workspace .workspace {
 
 .brand:hover {
   opacity: 0.9;
+}
+
+.brand-code {
+  color: var(--text);
+  font-weight: inherit;
+}
+
+.brand-junc {
+  color: #FF7700;
+  font-weight: inherit;
 }
 
 .brand-logo-img {
@@ -2857,17 +2884,8 @@ body.is-workspace .workspace {
 }
 
 /* ============================================================
-   MINIMAL WELCOME & LANGUAGE SELECTION PAGE STYLES
+   ORIGINAL LANGUAGE SELECTION PAGE STYLES
    ============================================================ */
-
-.welcome-centered {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  min-height: 100dvh;
-  width: 100%;
-}
 
 .language-selection-page {
   min-height: 100vh;
@@ -3010,3 +3028,5 @@ body.is-workspace .workspace {
   color: var(--accent);
   transform: translateX(3px);
 }
+
+

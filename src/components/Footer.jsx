@@ -14,7 +14,9 @@ export default function Footer() {
               height="20"
               style={{ objectFit: 'contain' }}
             />
-            <span className="footer-brand-name">CodeJunc</span>
+            <span className="footer-brand-name">
+              <span className="brand-code">Code</span><span className="brand-junc">Junc</span>
+            </span>
             <span className="footer-badge">v2.4</span>
           </div>
           <p className="footer-tagline">
@@ -26,7 +28,6 @@ export default function Footer() {
           <h4 className="footer-heading">Platform</h4>
           <ul className="footer-nav">
             <li><Link to="/">Home</Link></li>
-            <li><Link to="/languages">Languages</Link></li>
             <li><Link to="/compiler/python">Compiler</Link></li>
             <li><Link to="/documentation">Documentation</Link></li>
             <li><Link to="/about">About</Link></li>
@@ -56,7 +57,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} CodeJunc. Built for developers.</p>
+        <p>© {new Date().getFullYear()} <span className="brand-code">Code</span><span className="brand-junc">Junc</span>. Built for developers.</p>
         <div className="footer-bottom-meta">
           <span>Interpreted & Native Runtimes</span>
           <span className="footer-meta-dot">·</span>
