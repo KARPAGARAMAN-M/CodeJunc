@@ -42,18 +42,35 @@ export default function Compiler() {
   const [isLangOpen, setIsLangOpen] = useState(false);
   const langDropdownRef = useRef(null);
 
+  // Editor instance reference directly bound to Monaco Editor
+  const editorRef = useRef(null);
+
   // Code state per language (fresh default code; no persistence across sessions or languages)
   const [code, setCode] = useState(currentLanguage.starter);
+  const codeRef = useRef(code);
+  codeRef.current = code;
 
   // Stdin state
   const [stdin, setStdin] = useState('');
+  const stdinRef = useRef(stdin);
+  stdinRef.current = stdin;
 
   // Execution state
   const [output, setOutput] = useState('');
   const [error, setError] = useState('');
   const [notes, setNotes] = useState([]);
   const [status, setStatus] = useState('idle'); // 'idle' | 'running' | 'success' | 'error'
+  const statusRef = useRef(status);
+  statusRef.current = status;
   const [executionTime, setExecutionTime] = useState(null);
+
+  // Active language ref for reliable access during execution
+  const activeLangRef = useRef(activeLangKey);
+  activeLangRef.current = activeLangKey;
+
+  // Track timestamp to prevent duplicate execution triggers (e.g. Monaco command + window keydown)
+  const lastRunTriggerRef = useRef(0);
+  const handleRunRef = useRef(null);
 
   // Toast state
   const [toastMsg, setToastMsg] = useState('');
@@ -80,6 +97,9 @@ export default function Compiler() {
 
   // Reset workspace state to default Hello World starter
   const resetToDefaultCode = (reason) => {
+    if (editorRef.current) {
+      editorRef.current.setValue(currentLanguage.starter);
+    }
     setCode(currentLanguage.starter);
     setOutput('');
     setError('');
@@ -178,6 +198,9 @@ export default function Compiler() {
 
   // Switch language code when active language changes -> always load fresh Hello World default code
   useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.setValue(currentLanguage.starter);
+    }
     setCode(currentLanguage.starter);
     setOutput('');
     setError('');
@@ -195,12 +218,18 @@ export default function Compiler() {
 
   // Reset starter code
   const handleReset = () => {
+    if (editorRef.current) {
+      editorRef.current.setValue(currentLanguage.starter);
+    }
     resetToDefaultCode('Starter code restored');
     recordActivity();
   };
 
   // Clear code
   const handleClearCode = () => {
+    if (editorRef.current) {
+      editorRef.current.setValue('');
+    }
     setCode('');
     recordActivity();
     showToast('Editor cleared');
@@ -233,10 +262,35 @@ export default function Compiler() {
     recordActivity();
   };
 
-  // Run code handler
+  // Unified code execution handler: used identically by Run button and Ctrl+Enter
   const handleRun = async () => {
     recordActivity();
-    if (status === 'running') return;
+
+    // Prevent duplicate triggers within 250ms (e.g. Monaco editor command + window keydown)
+    const now = Date.now();
+    if (now - lastRunTriggerRef.current < 250) {
+      return;
+    }
+    lastRunTriggerRef.current = now;
+
+    if (statusRef.current === 'running') return;
+
+    // Retrieve latest code directly from Monaco Editor instance at execution time
+    let currentCode = codeRef.current;
+    if (editorRef.current) {
+      const editorVal = editorRef.current.getValue();
+      if (typeof editorVal === 'string') {
+        currentCode = editorVal;
+      }
+    }
+
+    const currentLang = activeLangRef.current || activeLangKey;
+    const currentStdin = stdinRef.current != null ? stdinRef.current : stdin;
+
+    // Keep React code state synchronized
+    if (currentCode !== code) {
+      setCode(currentCode);
+    }
 
     setStatus('running');
     setOutput('');
@@ -248,9 +302,9 @@ export default function Compiler() {
 
     try {
       const res = await runCode({
-        language: activeLangKey,
-        code,
-        stdin,
+        language: currentLang,
+        code: currentCode,
+        stdin: currentStdin,
         onOutput: (chunk) => {
           setOutput((prev) => prev + chunk);
         },
@@ -278,17 +332,22 @@ export default function Compiler() {
     }
   };
 
-  // Global keyboard shortcut: Ctrl+Enter / Cmd+Enter
+  // Keep handleRun ref up-to-date for shortcuts and callbacks
+  handleRunRef.current = handleRun;
+
+  // Global keyboard shortcut: Ctrl+Enter / Cmd+Enter (registered once, always calls latest handler)
   useEffect(() => {
     function handleKeyDown(e) {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        handleRun();
+        if (handleRunRef.current) {
+          handleRunRef.current();
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [code, stdin, activeLangKey, status]);
+  }, []);
 
   // Resizer logic
   const [outputHeight, setOutputHeight] = useState(240);
@@ -424,6 +483,7 @@ export default function Compiler() {
 
         {/* Tier 3: Monaco Code Editor */}
         <CodeEditor
+          editorRef={editorRef}
           language={currentLanguage}
           code={code}
           onChange={handleCodeChange}

@@ -11,12 +11,20 @@ export default function CodeEditor({
   onClear,
   onRun,
   onToast,
+  editorRef: externalEditorRef,
 }) {
   const { theme } = useTheme();
-  const editorRef = useRef(null);
+  const internalEditorRef = useRef(null);
+  const editorRef = externalEditorRef || internalEditorRef;
   const monacoRef = useRef(null);
   const [cursorPos, setCursorPos] = useState({ line: 1, column: 1 });
   const [isDirty, setIsDirty] = useState(false);
+
+  // Keep latest onRun in a ref so Monaco's addCommand keybinding always calls the current handler
+  const onRunRef = useRef(onRun);
+  useEffect(() => {
+    onRunRef.current = onRun;
+  }, [onRun]);
 
   // Check dirty state against starter
   useEffect(() => {
@@ -34,6 +42,9 @@ export default function CodeEditor({
   // Handle monaco mount
   function handleEditorDidMount(editor, monaco) {
     editorRef.current = editor;
+    if (externalEditorRef) {
+      externalEditorRef.current = editor;
+    }
     monacoRef.current = monaco;
     defineMonacoThemes(monaco);
 
@@ -45,9 +56,11 @@ export default function CodeEditor({
       });
     });
 
-    // Add Ctrl+Enter / Cmd+Enter keybinding to run code
+    // Add Ctrl+Enter / Cmd+Enter keybinding to run code using latest onRun ref
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
-      if (onRun) onRun();
+      if (onRunRef.current) {
+        onRunRef.current();
+      }
     });
 
     // Focus editor
@@ -64,16 +77,18 @@ export default function CodeEditor({
 
   // Handle copy code
   const handleCopyCode = () => {
-    if (!code) return;
-    navigator.clipboard.writeText(code).then(() => {
+    const currentCode = editorRef.current ? editorRef.current.getValue() : code;
+    if (!currentCode) return;
+    navigator.clipboard.writeText(currentCode).then(() => {
       if (onToast) onToast('Code copied to clipboard');
     }).catch(() => {});
   };
 
   // Handle download
   const handleDownload = () => {
+    const currentCode = editorRef.current ? editorRef.current.getValue() : code;
     const filename = language ? language.file : 'code.txt';
-    const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([currentCode], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

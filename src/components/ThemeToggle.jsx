@@ -5,7 +5,24 @@ const THEME_OPTIONS = [
   { id: 'dark', name: 'Dark', emoji: '🌙' },
   { id: 'light', name: 'Light', emoji: '☀️' },
   { id: 'crimson-forge', name: 'Crimson Forge', emoji: '🔥' },
-  { id: 'united', name: 'United', emoji: '🇺🇸' },
+  {
+    id: 'united',
+    name: 'United',
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#38BDF8"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ width: '16px', height: '16px', display: 'block' }}
+        aria-hidden="true"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+  },
   { id: 'system', name: 'System', emoji: '💻' },
 ];
 
@@ -179,11 +196,25 @@ export default function ThemeToggle({ variant = 'dropdown' }) {
                 aria-selected={isSelected}
                 onClick={() => handleSelectTheme(opt.id)}
               >
-                <span className="opt-name">
-                  <span className="opt-emoji" aria-hidden="true" style={{ marginRight: '8px' }}>
-                    {opt.emoji}
+                <span className="opt-name" style={{ display: 'flex', alignItems: 'center' }}>
+                  <span
+                    className="opt-emoji"
+                    aria-hidden="true"
+                    style={{
+                      marginRight: '8px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '16px',
+                      height: '16px',
+                      flexShrink: 0,
+                      fontSize: '15px',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {opt.icon || opt.emoji}
                   </span>
-                  {opt.name}
+                  <span>{opt.name}</span>
                 </span>
                 <svg
                   className="check"
