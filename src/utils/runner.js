@@ -11,6 +11,14 @@
    ============================================================ */
 
 /**
+ * Centralized API Base URL configuration:
+ * - In production: uses import.meta.env.VITE_API_BASE_URL (e.g. https://codejunc-backend.onrender.com)
+ * - In development: defaults to '' (relative path), proxied by Vite dev server to localhost:8080
+ */
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+const EXECUTE_ENDPOINT = `${API_BASE_URL}/api/execute`;
+
+/**
  * Execute user code through the CodeJunc Spring Boot backend API.
  *
  * @param {Object} options
@@ -41,7 +49,7 @@ export async function runCode({ language, code, stdin = '', onOutput }) {
 
   // 3. Dispatch execution request to Spring Boot backend
   try {
-    const response = await fetch('/api/execute', {
+    const response = await fetch(EXECUTE_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -163,7 +171,7 @@ export async function runCode({ language, code, stdin = '', onOutput }) {
   } catch (netErr) {
     return {
       output: '',
-      error: `Execution Service Error: Could not reach backend at /api/execute.\nDetails: ${netErr.message}.\nPlease ensure the Spring Boot backend is started on port 8080.`,
+      error: `Execution Service Error: Could not reach backend at ${EXECUTE_ENDPOINT}.\nDetails: ${netErr.message}.\nPlease ensure the Spring Boot backend is started and reachable.`,
       status: 'error',
     };
   }
