@@ -1883,7 +1883,7 @@ body.is-workspace .workspace {
 }
 
 /* ============================================================
-   OUTPUT PANEL (Below Editor)
+   OUTPUT PANEL & UNIFIED TERMINAL CONSOLE
    ============================================================ */
 .output-card {
   display: flex;
@@ -1900,50 +1900,120 @@ body.is-workspace .workspace {
   transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
-/* Output Head (Tabs + Status + Actions) */
-.output-head {
+/* Terminal Console Header */
+.terminal-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 38px;
-  padding: 0 10px 0 6px;
+  padding: 0 12px 0 10px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   gap: 12px;
   flex: none;
-  transition: background 0.2s var(--ease), border-color 0.2s var(--ease);
+  user-select: none;
 }
 
-.output-tabs {
+.terminal-title-group {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 12px;
 }
 
-.tab {
-  display: inline-flex;
+/* macOS / Linux style terminal window decoration dots */
+.terminal-dots {
+  display: flex;
   align-items: center;
   gap: 6px;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  color: var(--text-2);
-  font-size: 13px;
-  font-weight: 500;
-  transition: background 0.12s var(--ease), color 0.12s var(--ease);
 }
 
-.tab:hover {
+.terminal-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.terminal-dots .dot:hover {
+  opacity: 1;
+}
+
+.terminal-dots .dot-close {
+  background: #ff5f56;
+}
+
+.terminal-dots .dot-min {
+  background: #ffbd2e;
+}
+
+.terminal-dots .dot-max {
+  background: #27c93f;
+}
+
+.terminal-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.02em;
+}
+
+.terminal-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+}
+
+.terminal-name {
+  font-family: var(--font-mono);
+}
+
+/* Stdin toggle button in terminal header */
+.terminal-input-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--panel-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+
+.terminal-input-btn svg {
+  width: 12px;
+  height: 12px;
+  color: var(--text-3);
+  transition: transform 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.terminal-input-btn:hover {
   background: var(--panel-3);
   color: var(--text);
+  border-color: var(--border-strong);
 }
 
-.tab[aria-selected='true'] {
-  background: var(--selected-bg);
-  color: var(--text);
-  font-weight: 600;
+.terminal-input-btn.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-border);
 }
 
+.terminal-input-btn.is-active svg {
+  color: var(--accent);
+}
+
+/* Output Tools */
 .output-tools {
   display: flex;
   align-items: center;
@@ -1988,97 +2058,248 @@ body.is-workspace .workspace {
   border: 1px solid var(--error);
 }
 
-/* Output Body */
-.output-body {
+/* Terminal Body */
+.terminal-body {
   flex: 1;
-  overflow: auto;
-  padding: 12px 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px 14px;
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.6;
-  position: relative;
+  line-height: 1.5;
   background: var(--output-bg);
-}
-
-/* Panels */
-#panel-output,
-#panel-input {
-  height: 100%;
-}
-
-/* Empty Output State */
-.output-empty {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  min-height: 120px;
-  text-align: center;
-  color: var(--text-2);
   gap: 8px;
 }
 
-.empty-brand-wrap {
-  margin-bottom: 2px;
-}
-
-.empty-mark {
-  width: 32px;
-  height: auto;
-  opacity: 0.75;
-  display: block;
-  background: transparent;
-  border: none;
-}
-
-.output-empty p {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.output-empty small {
+/* Session prompt banner */
+.terminal-session-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: 12px;
+  color: var(--text-3);
+  user-select: none;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border-muted);
+}
+
+.terminal-host {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.terminal-sep {
   color: var(--text-3);
 }
 
-.output-empty kbd {
+.terminal-path {
+  color: var(--text-2);
+}
+
+.terminal-prompt {
+  color: var(--success);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.terminal-cmd {
+  color: var(--text-2);
+  margin-left: 4px;
+  font-style: italic;
+}
+
+/* Stdin Section in Terminal */
+.terminal-stdin-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.15s var(--ease);
+  overflow: hidden;
+}
+
+.terminal-stdin-section.has-content {
+  border-color: var(--accent-border);
+}
+
+.terminal-stdin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--panel-2);
+}
+
+.terminal-stdin-header:hover {
+  background: var(--panel-3);
+}
+
+.terminal-stdin-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.terminal-stdin-arrow {
+  color: var(--accent);
+  font-size: 11px;
+  transition: transform 0.15s ease;
+}
+
+.terminal-stdin-section.is-expanded .terminal-stdin-arrow {
+  transform: rotate(90deg);
+}
+
+.stdin-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--success-soft);
+  color: var(--success);
+  border: 1px solid var(--success);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.terminal-stdin-hint {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.terminal-stdin-box {
+  padding: 8px 10px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.terminal-stdin-guidance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+
+.stdin-clear-link {
+  background: none;
+  border: none;
+  color: var(--error);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  padding: 0 4px;
+  text-decoration: underline;
+}
+
+.stdin-clear-link:hover {
+  opacity: 0.8;
+}
+
+.terminal-stdin-textarea {
+  width: 100%;
+  min-height: 54px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 6px 10px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.terminal-stdin-textarea:focus {
+  border-color: var(--accent);
+}
+
+/* Output Stream */
+.terminal-output-stream {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Empty terminal state */
+.terminal-empty {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  color: var(--text-3);
+}
+
+.terminal-cursor-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.terminal-cursor-prompt {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.terminal-cursor-msg {
+  color: var(--text-3);
+}
+
+.terminal-cursor-msg strong {
+  color: var(--text);
+}
+
+.terminal-cursor-msg kbd {
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 1px 5px;
   background: var(--panel-3);
   border: 1px solid var(--border);
   border-radius: 4px;
-}
-
-/* Running state */
-.output-running {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
   color: var(--text-2);
 }
 
-.spinner {
-  width: 14px;
+.terminal-blink-cursor {
+  display: inline-block;
+  width: 7px;
   height: 14px;
-  border: 2px solid var(--border-strong);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.75s linear infinite;
+  background: var(--accent);
+  vertical-align: middle;
+  animation: terminal-blink 1s step-start infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
-/* Output Text */
-.output-text {
+.terminal-running {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  color: var(--warning);
+  font-size: 12px;
+}
+
+.terminal-stream-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terminal-stdout {
   margin: 0;
   padding: 0;
   white-space: pre-wrap;
@@ -2089,57 +2310,48 @@ body.is-workspace .workspace {
   line-height: inherit;
 }
 
-/* Error Diagnostic Block */
-.output-errors {
-  margin-top: 10px;
-  padding: 10px 12px;
+.terminal-stderr-wrap {
+  margin-top: 6px;
+  padding: 8px 12px;
   background: var(--error-soft);
   border: 1px solid var(--error-border);
   border-radius: var(--radius-sm);
   color: var(--error);
-  font-size: 12px;
-  line-height: 1.5;
 }
 
-.output-notes {
-  margin-top: 8px;
+.terminal-stderr {
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.terminal-notes {
+  margin-top: 4px;
   font-size: 11px;
   color: var(--text-3);
 }
 
-/* Stdin Textarea */
-#stdin {
-  width: 100%;
-  height: 100%;
-  min-height: 100px;
-  border: none;
-  outline: none;
-  resize: none;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  padding: 0;
-}
-
-#stdin::placeholder {
-  color: var(--text-3);
-}
-
-/* Output Foot */
-.output-foot {
+/* Terminal Footer */
+.terminal-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 24px;
-  padding: 0 14px;
+  padding: 0 12px;
   background: var(--surface);
   border-top: 1px solid var(--border);
   font-size: 11px;
   color: var(--text-3);
   font-family: var(--font-mono);
   flex: none;
+  user-select: none;
+}
+
+.terminal-foot-status {
+  color: var(--text-2);
 }
 
 /* Toast */

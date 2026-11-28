@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function OutputPanel({
   height,
@@ -13,18 +13,32 @@ export default function OutputPanel({
   onCopy,
   activeLanguage,
 }) {
-  const [activeTab, setActiveTab] = useState('output'); // 'output' | 'input'
-
-  // Automatically switch to Output tab when execution starts
-  useEffect(() => {
-    if (status === 'running') {
-      setActiveTab('output');
-    }
-  }, [status]);
+  const [isInputExpanded, setIsInputExpanded] = useState(false);
+  const consoleBodyRef = useRef(null);
+  const stdinInputRef = useRef(null);
 
   const hasOutput = output && output.trim().length > 0;
   const hasError = error && error.trim().length > 0;
+  const hasStdin = stdin && stdin.length > 0;
   const isRunning = status === 'running';
+
+  // Automatically scroll terminal to bottom when new output or error arrives
+  useEffect(() => {
+    if (consoleBodyRef.current) {
+      consoleBodyRef.current.scrollTop = consoleBodyRef.current.scrollHeight;
+    }
+  }, [output, error, status]);
+
+  // If user inputs stdin, expand the stdin prompt section automatically if collapsed
+  const handleToggleInput = () => {
+    setIsInputExpanded((prev) => {
+      const next = !prev;
+      if (next && stdinInputRef.current) {
+        setTimeout(() => stdinInputRef.current?.focus(), 50);
+      }
+      return next;
+    });
+  };
 
   const getErrorTypeBadge = (errText) => {
     if (!errText) return 'ERROR';
@@ -38,7 +52,7 @@ export default function OutputPanel({
 
   const getStatusChip = () => {
     if (isRunning) {
-      return <span className="status-chip is-running" role="status">Running</span>;
+      return <span className="status-chip is-running" role="status">Executing...</span>;
     }
     if (status === 'success') {
       return (
@@ -57,27 +71,43 @@ export default function OutputPanel({
     return <span className="status-chip is-idle" role="status">Ready</span>;
   };
 
+  const handleClearAll = () => {
+    onClear();
+  };
+
   return (
-    <section className="output-card" style={height ? { height: `${height}px` } : undefined} aria-label="Program output">
-      <div className="output-head">
-        <div className="output-tabs" role="tablist" aria-label="Output and input">
+    <section className="output-card terminal-card" style={height ? { height: `${height}px` } : undefined} aria-label="Terminal Console">
+      {/* Terminal Titlebar */}
+      <div className="output-head terminal-head">
+        <div className="terminal-title-group">
+          {/* Terminal window buttons */}
+          <div className="terminal-dots" aria-hidden="true">
+            <span className="dot dot-close" />
+            <span className="dot dot-min" />
+            <span className="dot dot-max" />
+          </div>
+
+          <div className="terminal-title">
+            <svg className="terminal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="4 17 10 11 4 5" />
+              <line x1="12" y1="19" x2="20" y2="19" />
+            </svg>
+            <span className="terminal-name">Terminal Console</span>
+          </div>
+
+          {/* Stdin Indicator / Quick Toggle Button */}
           <button
-            className={`tab ${activeTab === 'output' ? 'is-active' : ''}`}
             type="button"
-            role="tab"
-            aria-selected={activeTab === 'output'}
-            onClick={() => setActiveTab('output')}
+            className={`terminal-input-btn ${isInputExpanded || hasStdin ? 'is-active' : ''}`}
+            onClick={handleToggleInput}
+            title={isInputExpanded ? 'Collapse stdin input' : 'Configure program input (stdin)'}
+            aria-expanded={isInputExpanded}
           >
-            Output
-          </button>
-          <button
-            className={`tab ${activeTab === 'input' ? 'is-active' : ''}`}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'input'}
-            onClick={() => setActiveTab('input')}
-          >
-            Input
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+            <span>Stdin {hasStdin ? `(${stdin.split('\n').filter(Boolean).length || 1})` : ''}</span>
           </button>
         </div>
 
@@ -85,10 +115,10 @@ export default function OutputPanel({
           {getStatusChip()}
 
           <button
-            className="icon-btn output-only"
+            className="icon-btn"
             type="button"
-            title="Copy output"
-            aria-label="Copy output"
+            title="Copy console output"
+            aria-label="Copy console output"
             disabled={!hasOutput && !hasError}
             onClick={onCopy}
           >
@@ -99,11 +129,11 @@ export default function OutputPanel({
           </button>
 
           <button
-            className="icon-btn output-only"
+            className="icon-btn"
             type="button"
-            title="Clear output"
-            aria-label="Clear output"
-            onClick={onClear}
+            title="Clear console output"
+            aria-label="Clear console output"
+            onClick={handleClearAll}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M4 6.5h16" />
@@ -114,77 +144,125 @@ export default function OutputPanel({
         </div>
       </div>
 
-      <div className="output-body">
-        {activeTab === 'output' ? (
-          <div role="tabpanel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            {isRunning && (
-              <div className="output-running">
-                <span className="spinner" aria-hidden="true" />
-                <span>Running...</span>
-              </div>
-            )}
+      {/* Terminal Main Body */}
+      <div className="output-body terminal-body" ref={consoleBodyRef}>
+        {/* Terminal Header Banner */}
+        <div className="terminal-session-info">
+          <span className="terminal-host">codejunc@sandbox</span>
+          <span className="terminal-sep">:</span>
+          <span className="terminal-path">~/{activeLanguage?.id || 'workspace'}</span>
+          <span className="terminal-prompt">$</span>
+          <span className="terminal-cmd">
+            {isRunning
+              ? `executing ${activeLanguage?.name || 'program'}...`
+              : activeLanguage ? `ready (${activeLanguage.name} ${activeLanguage.version})` : 'ready'}
+          </span>
+        </div>
 
-            {!isRunning && !hasOutput && !hasError && (
-              <div className="output-empty">
-                <div className="empty-brand-wrap" aria-hidden="true">
-                  <img className="empty-mark" src="/assets/brand/brand-mark-transparent.png" alt="" />
-                </div>
-                <p>Ready to run</p>
-                <small>
-                  Press <kbd>Ctrl</kbd> + <kbd>↵</kbd> or click <strong>Run ▶</strong>
-                </small>
-              </div>
-            )}
-
-            {hasOutput && (
-              <pre className="output-text">{output}</pre>
-            )}
-
-            {hasError && (
-              <div className="output-errors">
-                <div className="error-badge">
-                  {getErrorTypeBadge(error)}
-                </div>
-                <pre>{error}</pre>
-              </div>
-            )}
-
-            {notes && notes.length > 0 && (
-              <div className="output-notes">
-                {notes.map((note, idx) => (
-                  <div key={idx} className="output-note-item">ℹ️ {note}</div>
-                ))}
-              </div>
-            )}
+        {/* Unified Input Prompt Section */}
+        <div className={`terminal-stdin-section ${isInputExpanded ? 'is-expanded' : ''} ${hasStdin ? 'has-content' : ''}`}>
+          <div className="terminal-stdin-header" onClick={handleToggleInput}>
+            <div className="terminal-stdin-label">
+              <span className="terminal-stdin-arrow">▸</span>
+              <strong>Program Standard Input (stdin)</strong>
+              {hasStdin && <span className="stdin-badge">Prepared</span>}
+            </div>
+            <span className="terminal-stdin-hint">
+              {isInputExpanded ? 'Click to collapse' : (hasStdin ? `${stdin.length} chars ready` : 'Click to add input values (Scanner, cin, scanf, input)')}
+            </span>
           </div>
-        ) : (
-          <div role="tabpanel" style={{ height: '100%' }}>
-            <textarea
-              className="stdin-textarea"
-              value={stdin}
-              onChange={(e) => setStdin(e.target.value)}
-              spellCheck="false"
-              autoComplete="off"
-              autoCapitalize="off"
-              placeholder="Program input (stdin)&#10;One value per line, or space-separated.&#10;&#10;e.g.&#10;5&#10;12"
-              aria-label="Program input (stdin)"
-            />
-          </div>
-        )}
+
+          {isInputExpanded && (
+            <div className="terminal-stdin-box">
+              <div className="terminal-stdin-guidance">
+                <span>Values are passed to standard input before execution. Use newlines or spaces between inputs.</span>
+                {hasStdin && (
+                  <button
+                    type="button"
+                    className="stdin-clear-link"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStdin('');
+                    }}
+                  >
+                    Clear stdin
+                  </button>
+                )}
+              </div>
+              <textarea
+                ref={stdinInputRef}
+                className="stdin-textarea terminal-stdin-textarea"
+                value={stdin}
+                onChange={(e) => setStdin(e.target.value)}
+                spellCheck="false"
+                autoComplete="off"
+                autoCapitalize="off"
+                placeholder="Enter input for your program here...&#10;e.g.&#10;21&#10;Alice&#10;10 20 30"
+                aria-label="Program standard input (stdin)"
+                rows={3}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Execution Output Stream */}
+        <div className="terminal-output-stream">
+          {isRunning && (
+            <div className="output-running terminal-running">
+              <span className="spinner" aria-hidden="true" />
+              <span>Running program in sandbox environment...</span>
+            </div>
+          )}
+
+          {!isRunning && !hasOutput && !hasError && (
+            <div className="output-empty terminal-empty">
+              <div className="terminal-cursor-line">
+                <span className="terminal-cursor-prompt">&gt;</span>
+                <span className="terminal-cursor-msg">Ready for execution. Press <strong>Run ▶</strong> or <kbd>Ctrl</kbd> + <kbd>↵</kbd></span>
+                <span className="terminal-blink-cursor" />
+              </div>
+            </div>
+          )}
+
+          {hasOutput && (
+            <div className="terminal-stdout-wrap">
+              <div className="terminal-stream-label">stdout:</div>
+              <pre className="output-text terminal-stdout">{output}</pre>
+            </div>
+          )}
+
+          {hasError && (
+            <div className="output-errors terminal-stderr-wrap">
+              <div className="error-badge">
+                {getErrorTypeBadge(error)}
+              </div>
+              <pre className="terminal-stderr">{error}</pre>
+            </div>
+          )}
+
+          {notes && notes.length > 0 && (
+            <div className="output-notes terminal-notes">
+              {notes.map((note, idx) => (
+                <div key={idx} className="output-note-item">ℹ️ {note}</div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="output-foot">
-        <span>
+      {/* Terminal Footer Info */}
+      <div className="output-foot terminal-foot">
+        <span className="terminal-foot-status">
           {status === 'running'
-            ? 'Executing code...'
+            ? '⚡ Executing code in isolated container...'
             : status === 'success'
-            ? `Finished in ${executionTime || 0}ms`
+            ? `✓ Process finished successfully in ${executionTime || 0}ms`
             : status === 'error'
-            ? 'Execution failed'
-            : 'Ready'}
+            ? '✕ Process terminated with error'
+            : '● Console ready'}
         </span>
         <span className="foot-hint">
-          {activeLanguage ? `${activeLanguage.name} ${activeLanguage.version} Environment` : 'Execution Environment'}
+          {activeLanguage ? `${activeLanguage.name} • Judge0 CE Sandbox` : 'Judge0 CE Sandbox'}
         </span>
       </div>
     </section>
